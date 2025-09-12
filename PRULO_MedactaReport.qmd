@@ -48,11 +48,7 @@ The surgeons from Geelong Orthopaedics participating in the Patient Registry of 
 
 The registry comprises three patient cohorts: rotator cuff pathology, glenohumeral instability, and general shoulder pathologies. Outcomes data collected by the registry include objective joint function, patient reported outcomes (pain, satisfaction, quality of life), radiological findings, surgical treatment and rates of revision surgery or complications.
 
-
-
 The dataset is derived from the PRULO registry snapshot and live database tables. A [protocol](https://academic.oup.com/jsprm/article/2023/4/snad014/7317733) has been previously prepared for the registry @scholes2023.
-
-
 
 # Glossary
 
@@ -314,8 +310,6 @@ Generate_selectrep <- function(config_list, ProductTable, SnapshotComb4,
   return(result_list)
 }
 ```
-
-
 
 ## Import Inputs
 
@@ -1157,8 +1151,6 @@ SnapshotCombCheck <- SnapshotComb2a |> dplyr::select(
 )
 ```
 
-
-
 ## Prepare product groups of interest
 
 Tables were rearranged and the dataset was filtered against an ignore list created from the product configuration table. Regular expressions were used to match products of interest to intraoperative hardware information and to sum the instances of implantation for each product of interest.
@@ -1184,7 +1176,6 @@ ProductUsage2 <- separate_longer_delim(
     )
 ```
 
-
 ```{r}
 ProductUsage3 <- ProductUsage2 |> summarise(
   .by = TreatmentID,
@@ -1202,7 +1193,6 @@ MasterTable <- SnapshotComb2a |> filter(
 
 
 ```
-
 
 ## Adjust patient demographics for presentation
 
@@ -1372,11 +1362,9 @@ MasterPROM2 <- MasterPROM |>
 
 ```
 
-
 ## Prepare adverse events
 
 Adverse events were monitored by near real-time chart review and surgical bookings. Events were added to the registry using an electronic form and linked to the treatment records. The data import was assessed for data entry validity, differences between date of event, date of reoperation and surgery date of the index treatment were calculated to assess date validity. Additional data preparation and cleaning was performed, which included filtering and standardizing key identifiers across multiple datasets. Missing values were identified to ensure data consistency. The adverse events were attached to the treatment data with filters applied to constrain to pertinent records and time periods. Time-based metrics were calculated and classification was performed based on the event descriptions using regular expressions. Finally, it conducted data quality checks, identifying potential discrepancies and duplicate entries. After the data transformation, the revised dataset was exported to an external file for review. The code then generated multiple subset datasets, each focusing on a specific type of complication and isolating the earliest occurrence for each unique treatment. This was used for retrieval for each product report.
-
 
 ```{r}
 #| label:  Complications-intraop
@@ -1401,10 +1389,6 @@ IntraopComp <- MasterTable1 |> dplyr::select(
 )
 
 ```
-
-
-
-
 
 ```{r}
 #| label:  Complications-postop
@@ -1437,8 +1421,6 @@ na_in_ComplicTable1 <- sum(is.na(ComplicTable1$TreatmentID))
 na_in_SnapshotComb2a <- sum(is.na(SnapshotComb2a$TreatmentID))
 
 ```
-
-
 
 ```{epoxy}
 #| eval: false
@@ -1649,7 +1631,6 @@ with_gs4_quiet(googlesheets4::range_write(
             range = "A1:C")
  )
 ```
-
 
 # PRULO Summary
 
@@ -2288,8 +2269,6 @@ SelectRep1Other <- SelectRep1 |> filter(
 )
 ```
 
-
-
 ```{r}
 #| label: tbl-intraop-complications-1A
 #| tbl-cap: "Summary of PRULO Report 1 (Rotator Cuff) Cases - Intraoperative Events"
@@ -2343,9 +2322,6 @@ if (!has_complications) {
 }
 
 ```
-
-
-
 
 ```{r}
 #| label: tbl-Rep1RC4
