@@ -1340,27 +1340,7 @@ MasterPROM1 <- MasterPROM |>
 
 ```
 
-```{r}
-#| label: PROM-prep-WORC
 
-MasterPROM2 <- MasterPROM |>
-  pivot_longer(
-    cols = c(
-      starts_with("WORCNorm"),
-      starts_with("WORCDelta"),
-      starts_with("WORCPhysicalQ3"),
-      starts_with("Eligible")
-    ),
-    names_to = c(".value", "Timepoint"),
-    names_pattern = "(.+)(Preop|6m|12m)",
-    values_to = c("WORCNorm","WORCDelta","WOSIPhysicalQ3", "Eligible")
-  ) |>
-  mutate(Timepoint = forcats::fct(
-    Timepoint, 
-    levels = c("Preop", "6m", "12m"))
-    ) |> filter(!is.na(Eligible))
-
-```
 
 ## Prepare adverse events
 
@@ -1425,14 +1405,14 @@ na_in_SnapshotComb2a <- sum(is.na(SnapshotComb2a$TreatmentID))
 ```{epoxy}
 #| eval: false
 
-There are {nrow(SnapshotComb2a |> filter(is.na(TreatmentID)))} cases with missing TreatmentID in the dataset and {nrow(ComplicTable1 |> filter(is.na(TreatmentID)))} missing in the complications table.
+There are {nrow(MasterTable1 |> filter(is.na(TreatmentID)))} cases with missing TreatmentID in the dataset and {nrow(ComplicTable1 |> filter(is.na(TreatmentID)))} missing in the complications table.
 
 ```
 
 <!--# Clean up live tables for complications. Assess date validity and correct data entry. -->
 
 ```{r}
-mismatched_rows <- ComplicTable1[!(ComplicTable1$TreatmentID %in% SnapshotComb2$TreatmentID), ]
+mismatched_rows <- ComplicTable1[!(ComplicTable1$TreatmentID %in% MasterTable1$TreatmentID), ]
 
 # Remove non-matching rows from ComplicTable2
 ComplicTable2 <- ComplicTable1 |>
@@ -1553,7 +1533,7 @@ with_gs4_quiet(googlesheets4::range_write(
   ss = SheetIDs$AuditResults,
   data = ComplicTable3,
   sheet = "ComplicTable",
-  range = "A1:AF",
+  range = "A1:AN",
   col_names = TRUE
 )
 )
@@ -1605,7 +1585,7 @@ with_gs4_quiet(googlesheets4::range_write(
   ss = SheetIDs$AuditResults,
   data = bind_rows(ComplicDiscrep,ComplicDiscrep2) |> arrange(TreatmentID),
   sheet = "ComplicDiscrepancy",
-  range = "A1:AD",
+  range = "A1:AN",
   col_names = TRUE
 )
 )
@@ -1623,7 +1603,7 @@ with_gs4_quiet(googlesheets4::range_write(
  #             sheet = "ComplicDiscrepancy2",
  #             range = "A1:AC")
 
- with_gs4_quiet(range_write(SnapshotComb2a |>
+ with_gs4_quiet(range_write(MasterTable1 |>
                filter(SurgicalTreatment == "Surgical" & is.na(ComplicationOccurrence)) |>
                dplyr::select(TreatmentID,DateTreatment),
              ss = SheetIDs$AuditResults,
@@ -1754,7 +1734,7 @@ The table below summarises patient diagnoses in the PRULO registry. The primary 
 #| tbl-cap: "Summary of PRULO surgical cases by cohort"
 
 TableRepB <-
-  SnapshotComb4 |> mutate(
+  MasterTable1 |> mutate(
     SurgeonA = case_when(
     Surgeon == "KE" ~ "A",
     Surgeon == "RP" ~ "B",
@@ -1833,7 +1813,7 @@ gtsummary::as_flex_table(TableRepB) |> flextable::set_table_properties(
 
 The overall registry enrolment is summarised in @tbl-surgical, describing how the population is summarised into cohorts.
 
-# Product Report 1 - Healix Advance PEEK with Dynacord
+# Product Report - JLock
 
 ## Sample Selection
 
