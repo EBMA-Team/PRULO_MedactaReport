@@ -1340,8 +1340,6 @@ MasterPROM1 <- MasterPROM |>
 
 ```
 
-
-
 ## Prepare adverse events
 
 Adverse events were monitored by near real-time chart review and surgical bookings. Events were added to the registry using an electronic form and linked to the treatment records. The data import was assessed for data entry validity, differences between date of event, date of reoperation and surgery date of the index treatment were calculated to assess date validity. Additional data preparation and cleaning was performed, which included filtering and standardizing key identifiers across multiple datasets. Missing values were identified to ensure data consistency. The adverse events were attached to the treatment data with filters applied to constrain to pertinent records and time periods. Time-based metrics were calculated and classification was performed based on the event descriptions using regular expressions. Finally, it conducted data quality checks, identifying potential discrepancies and duplicate entries. After the data transformation, the revised dataset was exported to an external file for review. The code then generated multiple subset datasets, each focusing on a specific type of complication and isolating the earliest occurrence for each unique treatment. This was used for retrieval for each product report.
@@ -1815,64 +1813,61 @@ The overall registry enrolment is summarised in @tbl-surgical, describing how th
 
 # Product Report - JLock
 
-## Sample Selection
+## Overview
 
-The sample of patients with the relevant product group were identified and data were retrieved for analysis by matching registry records to the relevant stock keeping units (SKUs) for the product group of interest. Usage statistics for the product group were added, and adverse events data were attached. Patient-reported data were retrieved and the dataset was manipulated to include relevant details for procedures of interest.
+Usage of the Product within the patient group is summarised below.
 
-```{r}
-#| label: Reference-Code-Rep1
+```{epoxy}
+#| label:  Overview-Rep
 
-RefCode1 <- ProductTable |> filter(
-  Category == "Anchor + Suture" &
-  stringr::str_detect(stringr::str_to_lower(Description),"advance") &
-  stringr::str_detect(stringr::str_to_lower(Description),"peek") &
-  stringr::str_detect(stringr::str_to_lower(Description),"dynacord") &
-  stringr::str_detect(stringr::str_to_lower(Description),"healix")  
-)
+{
+  if(nrow(MasterTable1) == 1) {
+    epoxy::epoxy("There is {nrow(MasterTable1)} case involving the anchor of interest.")
+  } else {
+    procedures <- unique(MasterTable1$ProcedureTotal)
+    procedures <- procedures[procedures != "None" & procedures != "Unknown" & procedures != ""]
+    procedures <- procedures[!grepl("^(Tenodesis|Tenotomy)$", procedures)]
+    
+    procedures_string <- if(length(procedures) > 1) {
+  result1 <- paste(procedures[-length(procedures)], collapse = "] [")
+  paste0(result1, "], and [", procedures[length(procedures)])
+    } else {
+      procedures
+    }
+    
+    epoxy::epoxy("There are {nrow(MasterTable1)} cases involving the anchor of interest. Surgeries were performed between {format(min(MasterTable1$DateTreatment),'%Y-%b-%d')} and {format(max(MasterTable1$DateTreatment),'%Y-%b-%d')}. The procedures included [{procedures_string}].")
+  }
+}
+
+# {ifelse(nrow(MasterTable1) <= 1,
+#         epoxy::epoxy("There is {nrow(MasterTable1)} case(s) involving the anchor of interest and a Bankart repair. There is insufficient sample size to provide a report."),
+#         ifelse(dplyr::between(nrow(MasterTable2BR),2,5),
+#         epoxy::epoxy("There are {nrow(MasterTable2BR)} cases involving the anchor of interest and a Bankart repair. Surgeries were performed between {format(min(MasterTable2BR$DateTreatment),'%Y-%b-%d')} to {format(max(MasterTable2BR$DateTreatment),'%Y-%b-%d')}. There is insufficient sample size to provide a report."),
+#         epoxy::epoxy("There are {nrow(MasterTable2BR)} cases involving the anchor of interest and a Bankart repair. Surgeries were performed between {format(min(MasterTable2BR$DateTreatment),'%Y-%b-%d')} to {format(max(MasterTable2BR$DateTreatment),'%Y-%b-%d')}."
+#         )))} 
+# 
+# {ifelse(nrow(MasterTable2SLAP) == 1,
+#         epoxy::epoxy("There is {nrow(MasterTable2SLAP)} case(s) involving the anchor of interest and a SLAP repair. There is insufficient sample size to provide a report."),
+#         ifelse(dplyr::between(nrow(MasterTable2SLAP),2,5),
+#         epoxy::epoxy("There are {nrow(MasterTable2SLAP)} cases involving the anchor of interest and a SLAP repair. Surgeries were performed between {format(min(MasterTable2SLAP$DateTreatment),'%Y-%b-%d')} to {format(max(MasterTable2SLAP$DateTreatment),'%Y-%b-%d')}. There is insufficient sample size to provide a report."),
+#         epoxy::epoxy("There are {nrow(MasterTable2SLAP)} cases involving the anchor of interest and a SLAP repair. Surgeries were performed between {format(min(MasterTable2SLAP$DateTreatment),'%Y-%b-%d')} to {format(max(MasterTable2SLAP$DateTreatment),'%Y-%b-%d')}."
+# )))} 
+
 
 ```
 
+## Procedure Report - All
+
 ```{r}
-#| label:  Slice-stack-Rep1
+#| label: Slice-stack-Rep
 
 
-Pattern1 <- "(healix advance peek dynacord)"
-
-SelectRep1 <- SnapshotComb4 |> 
-  filter(
-    str_detect(ImplantCodes,paste(RefCode1$Reference,collapse = "|"))
-  ) |> mutate(
-    Product1Check = stringr::str_detect(stringr::str_to_lower(Product1),Pattern1),
-    Product2Check = stringr::str_detect(stringr::str_to_lower(Product2),Pattern1),
-    Product3Check = stringr::str_detect(stringr::str_to_lower(Product3),Pattern1),
-    Product4Check = stringr::str_detect(stringr::str_to_lower(Product4),Pattern1)
-  ) |> mutate(
-    Product1Count = case_when(
-      Product1Check == TRUE ~ stringr::str_extract(Product1,"\\d"),
-      .default = NA
+MasterTable2 <- MasterTable1 |> mutate(
+    CuffStatus2 = case_when(
+      is.na(CuffStatus) & !is.na(PatientPosition) ~ "Intact",
+      !is.na(CuffStatus) ~ CuffStatus,
+      .default = NA_character_
     ),
-    Product2Count = case_when(
-      Product2Check == TRUE ~ stringr::str_extract(Product2,"\\d"),
-      .default = NA
-    ),
-    Product3Count = case_when(
-      Product3Check == TRUE ~ stringr::str_extract(Product3,"\\d"),
-      .default = NA
-    ),
-    Product4Count = case_when(
-      Product4Check == TRUE ~ stringr::str_extract(Product4,"\\d"),
-      .default = NA
-      )
-    ) |> mutate(
-      across(Product1Count:Product4Count,~as.numeric(.))
-    ) |> rowwise() |> mutate(
-    ProductCount =  sum(across(Product1Count:Product4Count), na.rm = TRUE)
-      ) |> mutate(
-        ProductCountFct = forcats::fct(
-            as.character(ProductCount),
-            levels = c("1","2","3","4","5")
-          )
-        ) |> mutate(
   Infection = TreatmentID %in% ComplicInfection$TreatmentID,
   Ligament_Tendon = TreatmentID %in% ComplicLigament_Tendon$TreatmentID,
   Stiffness = TreatmentID %in% ComplicStiffness$TreatmentID,
@@ -1888,14 +1883,7 @@ SelectRep1 <- SnapshotComb4 |>
 
   Reop = TreatmentID %in% ComplicReop$TreatmentID
 ) |> left_join(
-  ComplicTable3 |> 
-    group_by(TreatmentID) |>
-    slice_max(
-      ymd(`Reoperation Procedure Date`), 
-      n = 1, 
-      na_rm = TRUE,
-      with_ties = FALSE
-      ) |> ungroup() |> dplyr::select(
+  ComplicTable3 |> group_by(TreatmentID) |> slice_max(`Reoperation Procedure Date`, n = 1) |> ungroup() |> dplyr::select(
     TreatmentID,
     ReopDelay_Occur,
     ReopDelay_Surgery,
@@ -1905,109 +1893,16 @@ SelectRep1 <- SnapshotComb4 |>
 )
 ```
 
-```{r}
-# validate slicemax
-
-SliceCheck <- ComplicTable3 |> 
-    group_by(TreatmentID) |>
-    slice_max(
-      ymd(`Reoperation Procedure Date`), 
-      n = 1, 
-      na_rm = TRUE,
-      with_ties = FALSE
-      ) |> dplyr::select(
-    TreatmentID,
-    `Complication ID`,
-    ReopDelay_Occur,
-    ReopDelay_Surgery,
-    EventDelay,
-    Timestamp
-  ) |> ungroup() 
-```
-
-```{r}
-#| label: Select-PROMs-Rep1
-
-SelectRep1PROM1 <- SnapshotPROM1 |>
-  filter(
-    str_detect(ImplantCodes,paste(RefCode1$Reference,collapse = "|"))
-  )
-
-SelectRep1PROM2 <- SnapshotPROM2 |>
-  filter(
-    str_detect(ImplantCodes,paste(RefCode1$Reference,collapse = "|"))
-  )
-
-```
-
-```{r}
-#| label: Select-Procedure-Rep1
-
-SelectRep1RC <- SelectRep1 |> filter(str_detect(CuffRepair,"Repair"))
-#SelectRep1RCno <- SelectRep1 |> filter(str_detect(CuffRepair,"Repair",negate = TRUE) | is.na(CuffRepair))
-
-SelectRep1RCPROM1 <- SelectRep1PROM1 |> filter(str_detect(CuffRepair,"Repair"))
-SelectRep1RCPROM2 <- SelectRep1PROM2 |> filter(str_detect(CuffRepair,"Repair"))
-
-SelectRep1BT <- SelectRep1 |> filter(str_detect(LongHeadBiceps,"Tenodesis"))
-SelectRep1BTPROM1<- SelectRep1PROM1 |> filter(str_detect(LongHeadBiceps,"Tenodesis"))
-SelectRep1BTPROM2<- SelectRep1PROM2 |> filter(str_detect(LongHeadBiceps,"Tenodesis"))
-```
-
-## Overview
-
-Usage of the Product within the patient group is summarised below.
-
-<!--# Insert date range into epoxy block -->
-
-```{epoxy}
-#| label:  Overview-Rep1
-
-{
-  if(nrow(SelectRep1) == 1) {
-    epoxy::epoxy("There is {nrow(SelectRep1)} case involving the anchor of interest.")
-  } else {
-    procedures <- unique(SelectRep1$ProcedureTotal)
-    procedures <- procedures[procedures != "None" & procedures != "Unknown" & procedures != ""]
-    procedures <- procedures[!grepl("^(Tenodesis|Tenotomy)$", procedures)]
-    
-    procedures_string <- if(length(procedures) > 1) {
-  result1 <- paste(procedures[-length(procedures)], collapse = "] [")
-  paste0(result1, "], and [", procedures[length(procedures)])
-    } else {
-      procedures
-    }
-    
-    epoxy::epoxy("There are {nrow(SelectRep1)} cases involving the anchor of interest. Surgeries were performed between {format(min(SelectRep1$DateTreatment),'%Y-%b-%d')} and {format(max(SelectRep1$DateTreatment),'%Y-%b-%d')}. The procedures included [{procedures_string}].")
-  }
-}
-{ifelse(nrow(SelectRep1RC) == 1,
-        epoxy::epoxy("There is {nrow(SelectRep1RC)} case involving the anchor of interest and a rotator cuff repair."),
-        epoxy::epoxy("There are {nrow(SelectRep1RC)} cases involving the anchor of interest and a rotator cuff repair. Surgeries were performed between {format(min(SelectRep1RC$DateTreatment),'%Y-%b-%d')} to {format(max(SelectRep1RC$DateTreatment),'%Y-%b-%d')}.")
-)} 
-{ifelse(nrow(SelectRep1BT) == 1,
-        epoxy::epoxy("There is {nrow(SelectRep1BT)} case involving the anchor of interest and a biceps tenodesis."),
-        epoxy::epoxy("There are {nrow(SelectRep1BT)} cases involving the anchor of interest and a biceps tenodesis. Surgeries were performed between {format(min(SelectRep1BT$DateTreatment),'%Y-%b-%d')} to {format(max(SelectRep1BT$DateTreatment),'%Y-%b-%d')}.")
-)}
-
-
-
-
-```
-
-## Procedure Report - Rotator Cuff Repair
-
 ### Patient Characteristics
 
 Patient demographic, pathology, and treatment characteristics for this cohort receiving the Product are summarised below.
 
 ```{r}
-#| label: tbl-rep1RC1pat
-#| tbl-cap: "Summary of PRULO Report 1 (Rotator Cuff) Case - Patient Characteristics"
+#| label: tbl-TableRep
+#| tbl-cap: "Summary of PRULO Report JLock (All) - Patient Characteristics"
 
-#Dont insert chunk names into table chunks - quarto bug makes it wig out when there is a named chunk for some reason
-
-TableRep1RC1 <- SelectRep1RC |> mutate(
+TableRep <-
+  MasterTable1 |> mutate(
     SurgeonA = case_when(
       Surgeon == "KE" ~ "A",
       Surgeon == "RP" ~ "B",
@@ -2023,12 +1918,12 @@ TableRep1RC1 <- SelectRep1RC |> mutate(
     SymptomDuration,
     SymptomDurationCat,
     #SurgeonA,
-    LongHeadBiceps,
+    #LongHeadBiceps,
     TreatmentStatus,
     RegistryStatus
     ) |>
     tbl_summary(
-      by = LongHeadBiceps,
+      #by = LongHeadBiceps,
       label = list(
         #SurgeonA ~ "Surgeon",
         AgeAtInitialExam ~ "Age at Initial Consultation (Years)",
@@ -2059,7 +1954,7 @@ TableRep1RC1 <- SelectRep1RC |> mutate(
       missing = "no"
     ) |> add_stat_label(
     location = "column"
-  ) |> add_overall() |> modify_table_styling(
+  ) |> modify_table_styling(
       columns = label,
       rows = label == "Symptom Duration Category",
       footnote = "Dichotomised below or equal to 0.5 years or greater than 0.5 years"
@@ -2071,9 +1966,9 @@ TableRep1RC1 <- SelectRep1RC |> mutate(
       columns = label,
       rows = label == "Patient Record Active",
       footnote = "Patient record remains open - no change to consent or mortality status"
-  )
+  ) 
 
-gtsummary::as_flex_table(TableRep1RC1) |> flextable::set_table_properties(
+gtsummary::as_flex_table(TableRep) |> flextable::set_table_properties(
   layout = "autofit",
   width = 0.5,
   align = "center",
@@ -2089,76 +1984,62 @@ gtsummary::as_flex_table(TableRep1RC1) |> flextable::set_table_properties(
 Surgical findings and management strategies are summarised below.
 
 ```{r}
-#| eval: false
+#| label: tbl-TableRep2
+#| tbl-cap: "Summary of PRULO Report 6 (All) Cases Pathology and Surgical Details"
 
-CuffStatus1 <- SelectRep1RC |> filter(is.na(CuffStatus))
-```
 
-<!--# There are a couple of cases that do not seem to fit the cuff status field properly. There is one GHI case that has the repair details (1399.1), but not cuff status inserted. The other is a general case that is a retorn RCR that probably needs to be moved across cohorts (193.2). -->
-
-```{r}
-#| label: tbl-rep1RC1Surg
-#| tbl-cap: "Summary of PRULO Report 1 (Rotator Cuff) Cases Pathology and Surgical Details"
-
-TableRep1RC2 <-
-  SelectRep1RC |>
+TableRep2 <-
+  MasterTable2 |>
   dplyr::select(
-    CuffStatus,
+    CuffStatus2,
     TreatmentType,
-    ProductCountFct, #This has a code block it depends on to derive this count within the dataframe - ensure its copied|amended into each report as required
+    # ProductCountFct, #This has a code block it depends on to derive this count within the dataframe - ensure its copied|amended into each report as required
     CuffRepair:AdjunctProcedure) |>
   tbl_summary(
-      by = LongHeadBiceps,
+      #by = LongHeadBiceps,
       label = list(
-        ProductCountFct ~ "Product Count",
-        CuffStatus ~ "Cuff Status",
-        TreatmentType ~ "Treatment Type",
-        CuffRepair ~ "Cuff Repair",
-        RepairAugmentation ~ "Repair Augmentation",
-        LabrumRepair ~ "Labrum Repair",
-        CapsuleLigament ~ "Capsule | Ligament",
-        AdjunctProcedure ~ "Adjunct Procedure"
+        CuffStatus2 ~ "Cuff Status",
+        TreatmentType ~ "Treatment Type"
       ),
       statistic = list(
         all_categorical() ~ "{p} ({n})"
         ),
       missing = "no"
-    ) |> add_overall() |> modify_table_styling(
+    ) |> modify_table_styling(
       columns = label,
       rows = label == "Other",
-      footnote = "Biceps tendon integration; Biceps tendon transfer; Tendon advancement"
+      footnote = "Labral tear uncategorised"
     ) 
 
-gtsummary::as_flex_table(TableRep1RC2) |> flextable::set_table_properties(
+gtsummary::as_flex_table(TableRep2) |> flextable::set_table_properties(
   layout = "autofit",
-  width = 0.15,
+  width = 0.5,
   align = "center",
   opts_word = list(
     split = TRUE
     )
 )
-
-  
 ```
 
 ### Treatment Survival
 
 ```{epoxy}
-#| label:  Duration-Rep1-Proc1
+#| label:  Duration-Rep6-Proc1
 
-The mean follow up duration is {round(SelectRep1RC |> ungroup() |> summarise(mean = mean(Duration))/52,1)} years, with a standard deviation of {round(SelectRep1RC |> ungroup() |> summarise(sd = sd(Duration))/52,2)} years.
+
+The mean follow up duration is {round(MasterTable2 |> ungroup() |> summarise(mean = mean(Duration))/52,1)} years, with a standard deviation of {round(MasterTable2 |> ungroup() |> summarise(sd = sd(Duration))/52,2)} years.
 
 ```
 
-Failure or revision events as identified in the registry for this cohort are summarised below. Individual failure data can be accessed in [Attachment 1](https://docs.google.com/spreadsheets/d/1ESVvSKAv8ma11kri9pby6OEU9Gk5Z3UnF6XwjXBTcTg/edit#gid=0).
+Failure or revision events as identified in the registry for this cohort are summarised below. Individual failure data can be accessed in [Attachment 1](https://docs.google.com/spreadsheets/d/https://docs.google.com/spreadsheets/d/1ESVvSKAv8ma11kri9pby6OEU9Gk5Z3UnF6XwjXBTcTg/edit).
 
 ```{r}
-#| label: tbl-rep1RC3
-#| tbl-cap: "Summary of PRULO Report 1 (Rotator Cuff) Procedure Survival"
+#| label: tbl-TableRep3
+#| tbl-cap: "Summary of PRULO Report 6 (All) Cases - Procedure Survival"
 
-TableRep1RC3 <- tbl_survfit(
+TableRep3 <- tbl_survfit(
   survfit2(Surv(Duration, Status) ~ 1, 
-           data = SelectRep1RC),
+           data = MasterTable2),
   times = c(1,26,52,104),
   label_header = "**{time} Weeks**",
   label = "Procedure Survival",
@@ -2166,15 +2047,12 @@ TableRep1RC3 <- tbl_survfit(
 ) |> gtsummary::modify_footnote_header(
     footnote = "% survival with 95% confidence intervals",
     columns = all_stat_cols(),
-  ) |> gtsummary::modify_footnote_header(
-    footnote = "% survival with 95% confidence intervals",
-    columns = all_stat_cols(),
   )
 
-gtsummary::as_flex_table(TableRep1RC3) |> flextable::set_table_properties(
+gtsummary::as_flex_table(TableRep3) |> flextable::set_table_properties(
   layout = "autofit",
   width = 0.5,
-  align = "left",
+  align = "center",
   opts_word = list(
     split = TRUE
     )
@@ -2183,13 +2061,13 @@ gtsummary::as_flex_table(TableRep1RC3) |> flextable::set_table_properties(
 ```
 
 ```{r}
-#| label:  Failure-Rep-Rep1A-Proc1
+#| label:  Failure-Report-Rep6A-Proc1
 
 #Previous surgery(ies) at the same site Anatomical Location 
 #Anchor 1 Anchor 2 Anchor 3 Anchor 4
 
-FailuresRep1RC <-
-  SelectRep1RC |> mutate(
+FailuresRep6 <-
+  MasterTable2 |> mutate(
     TreatmentStatusDesc = stringr::str_to_sentence(TreatmentStatusNotes)
   ) |>
       filter(TreatmentStatus == "Failed") |> 
@@ -2202,33 +2080,31 @@ FailuresRep1RC <-
     TreatmentStatusDesc,
     ReoperationProcedure2,
     SubsequentTx2,
-    Product1,
-    Product2,
-    Product3,
-    Product4,
     QDASH_TotalScore_Preop,
     QDASH_TotalScore_3months,
     QDASH_TotalScore_6months) |> mutate(
-      Group = "CuffRepair"
+      Procedure = "All"
+    ) |> arrange(
+      TreatmentID
     )
 
 ```
 
-```{r}
-#| label:  Failure-Report-Rep1B-Proc1
-#| eval: true
+```{epoxy}
+#| label: Failure-Report-Rep6B-Proc1
 
-{ifelse(nrow(FailuresRep1RC) == 0,
+{ifelse(nrow(FailuresRep6) == 0,
         epoxy::epoxy("There are no failures or revisions to report."),
        with_gs4_quiet(googlesheets4::range_write(
          ss = SheetIDs$AuditReport,
-         data = FailuresRep1RC |> arrange(TreatmentID),
-         sheet = "Failures1",
+         data = FailuresRep6 |> arrange(TreatmentID),
+         sheet = "Failures6",
          range = "A1:P",
          col_names = TRUE
          )
        )
-)}
+)
+  }
 
 
 ```
@@ -2238,9 +2114,44 @@ FailuresRep1RC <-
 Complications and adverse events are summarised below. Individual reoperation data can be accessed in [Attachment 1](https://docs.google.com/spreadsheets/d/1ESVvSKAv8ma11kri9pby6OEU9Gk5Z3UnF6XwjXBTcTg/edit#gid=0).
 
 ```{r}
-#| label:  Complication-Other-Rep1
+#| label: IntraopComp - Rep6A
 
-SelectRep1Other <- SelectRep1 |> filter(
+
+# Check if any Count value is greater than zero in filtered data
+has_complications <- MasterTable2 |> 
+  filter(TreatmentID %in% IntraopComp$TreatmentID) |> 
+  nrow() > 0
+
+# Conditionally set chunk options and generate table
+if (has_complications == 0) {
+  # If no rows, return the text message
+  epoxy("No intraoperative complications observed.")
+} else {
+  knitr::opts_current$set(
+    label = "tbl-intraop-complications-6",
+    tbl.cap = "Summary of PRULO Report 6 (All) Cases - Intraoperative Events"
+  )
+  
+  IntraopComp |> filter(
+    TreatmentID %in% MasterTable2$TreatmentID
+  ) |> rename(
+    Description = "ICNature2",
+    Intervention = "ICIntervention",
+    PostopManagement = "ICPostopManagement"
+  ) |> select(
+    TreatmentID,
+    Description,
+    Intervention,
+    PostopManagement
+    ) |> gt::gt()
+}
+```
+
+```{r}
+#| label:  Complication-Other-Rep6
+
+
+MasterTable2Other <- MasterTable2 |> filter(
   Other == TRUE
 ) |> dplyr::select(
   TreatmentID,
@@ -2250,65 +2161,11 @@ SelectRep1Other <- SelectRep1 |> filter(
 ```
 
 ```{r}
-#| label: tbl-intraop-complications-1A
-#| tbl-cap: "Summary of PRULO Report 1 (Rotator Cuff) Cases - Intraoperative Events"
-
-# Check if any complications exist in filtered data
-has_complications <- SelectRep1RC |> 
-  filter(TreatmentID %in% IntraopComp$TreatmentID) |> 
-  nrow() > 0
-
-# Conditionally generate content
-if (!has_complications) {
-  # If no complications, return the text message
-  epoxy("No intraoperative complications observed.")
-} else {
-  # Calculate incidence and confidence intervals
-  total_cases <- nrow(SelectRep1RC)
-  complication_cases <- SelectRep1RC |> 
-    filter(TreatmentID %in% IntraopComp$TreatmentID) |> 
-    nrow()
-  
-  # Calculate proportion and 95% CI using Wilson method
-  prop_result <- binom::binom.confint(complication_cases, total_cases, 
-                                      methods = "wilson")
-  incidence_pct <- round(prop_result$mean * 100, 1)
-  ci_lower <- round(prop_result$lower * 100, 1)
-  ci_upper <- round(prop_result$upper * 100, 1)
-  
-  # Generate summary sentence
-  summary_text <- glue::glue(
-    "Intraoperative events occurred in {complication_cases} of {total_cases} cases ({incidence_pct}%, 95% CI: {ci_lower}%-{ci_upper}%)."
-  )
-  
-  # Print summary sentence
-  cat(summary_text, "\n\n")
-  
-  # Generate and return the table
-  IntraopComp |> 
-    filter(TreatmentID %in% SelectRep1RC$TreatmentID) |> 
-    rename(
-      Description = "ICNature2",
-      Intervention = "ICIntervention",
-      PostopManagement = "ICPostopManagement"
-    ) |> 
-    select(
-      TreatmentID,
-      Description,
-      Intervention,
-      PostopManagement
-    ) |> 
-    gt::gt()
-}
-
-```
-
-```{r}
-#| label: tbl-Rep1RC4
-#| tbl-cap: "Summary of PRULO Report 1 (Rotator Cuff) Cases - Postoperative Events."
+#| label: tbl-TableRep64
+#| tbl-cap: "Summary of PRULO Report Cases - Postoperative Events"
 
 # Now create the summary table
-TableRep1RC4 <- SelectRep1RC |>
+TableRep64 <- MasterTable2 |>
   dplyr::select(
     Infection,
     Ligament_Tendon,
@@ -2328,7 +2185,6 @@ TableRep1RC4 <- SelectRep1RC |>
     label = list(
       Ligament_Tendon ~ "Ligament|Tendon (Retear)",
       ReopDelay_Surgery ~ "Reoperation Delay (Weeks)",
-      
       Reop ~ "Reoperation",
       SubsequentTx2 ~ "Subsequent Treatment"
       ),
@@ -2339,16 +2195,10 @@ TableRep1RC4 <- SelectRep1RC |>
       all_categorical() ~ "{p} ({n})",
       all_continuous() ~ "{mean} ({sd})"
     ),
-    missing = "no",) |> add_ci(
-      statistic = list(
-        all_categorical() ~ "{conf.low} - {conf.high}",
-        all_continuous() ~ "{conf.low} - {conf.high}"
-        
-      )
-    ) |> modify_table_styling(
-      columns = label,
-      rows = label == "Other",
-      footnote = "Myocardial Infarction"
+    missing = "no",
+    digits = list(
+      all_continuous() ~ 1,
+      all_categorical() ~ 0)
     ) |> modify_table_styling (
       columns = label,
       rows = label == "Subsequent Treatment",
@@ -2363,19 +2213,18 @@ TableRep1RC4 <- SelectRep1RC |>
       footnote = "Time between index procedure and reoperation"
     ) 
 
-gtsummary::as_flex_table(TableRep1RC4) |> flextable::set_table_properties(
+gtsummary::as_flex_table(TableRep64) |> flextable::set_table_properties(
   layout = "autofit",
   width = 0.5,
   align = "center",
   opts_word = list(
-  split = TRUE
-  )
+    split = TRUE
+    )
 )
-
 ```
 
 ```{r}
-#| label:  Reoperations-Rep1A-Proc1
+#| label: Reoperations-Report-Rep6A-Proc1
 
 #echo: false
 #warning: false
@@ -2386,22 +2235,18 @@ gtsummary::as_flex_table(TableRep1RC4) |> flextable::set_table_properties(
 ##Flip this around so that multiple reoperations are retained
 
 
-SelectRep1RCReop <- ComplicTable3 |> filter(
-  TreatmentID %in% SelectRep1RC$TreatmentID,
+MasterTable2Reop <- ComplicTable3 |> filter(
+  TreatmentID %in% MasterTable2$TreatmentID,
   `Reoperation Procedure` == "Yes"
   ) |> group_by(TreatmentID) |> slice_min(
     ReopDelay_Surgery,
     n = 1
     ) |> ungroup() |> left_join(
-    SelectRep1 |> dplyr::select(
+      MasterTable2 |> dplyr::select(
     TreatmentID,
     AgeAtInitialExam,
     Sex,
     TreatmentType,
-    Product1,
-    Product2,
-    Product3,
-    Product4,
     QDASH_TotalScore_Preop,
     QDASH_TotalScore_3months,
     QDASH_TotalScore_6months
@@ -2419,41 +2264,36 @@ SelectRep1RCReop <- ComplicTable3 |> filter(
     Sex,
     TreatmentType,
     `Complication Nature`,
-
-    EventDelay,
-    Product1,
-    Product2,
-    Product3,
-    Product4,
     QDASH_TotalScore_Preop,
     QDASH_TotalScore_3months,
     QDASH_TotalScore_6months
-    ) |> mutate(
-      Procedure = "Cuff Repair"
-      ) |> arrange(
+  ) |> mutate(
+    Procedure = "All"
+    ) |> arrange(
     TreatmentID
     )
 
 ```
 
-<!--# Write reoperations to external sheet -->
+Write reoperations to external sheet
 
 ```{epoxy}
-#| label: Reoperations-Report-Rep1B-Proc1
-#| eval: true
+#| label: Reoperations-Report-Rep6B-Proc1
 
-{ifelse(nrow(SelectRep1RCReop) == 0,
-        epoxy::epoxy("There are no reoperations or to report."),
+
+
+{ifelse(nrow(MasterTable2Reop) == 0,
+        epoxy::epoxy("There are no reoperations to report."),
        with_gs4_quiet(googlesheets4::range_write(
          ss = SheetIDs$AuditReport,
-         data = SelectRep1RCReop,
-         sheet = "Reoperations1",
+         data = MasterTable2Reop,
+         sheet = "Reoperations6",
          range = "A1:P",
          col_names = TRUE
          )
-      )
+       )
 )
-      }
+  }
 
 
 
@@ -2461,85 +2301,54 @@ SelectRep1RCReop <- ComplicTable3 |> filter(
 
 ### Patient-Reported Outcomes
 
-Complete case analysis of QDASH, WORC Index Normalised, and WORC Physical Question 3 (How much weakness do you experience in your shoulder?) is summarised below.
+Complete case analysis of QDASH and WOSI Index Normalised is summarised below.
 
 ```{r}
-#| label: fig-PROMs-Rep1
-#| fig-cap: "Complete case analysis of QDASH(Top), WORC Normalised (Middle) and WORC Physical Question 3 (Bottom)."
-#| fig-cap-location: bottom
+#| label: fig-PROMRep6
+#| fig-cap: "Complete case analysis of QDASH(Top), WOSI Index (Bottom)"
 
-Rep1RCPROM1 <- ggplot(data = SelectRep1RCPROM1, mapping = aes(Timepoint,QDASH)) + 
+
+Rep6PROM1 <- ggplot(data = MasterTable2PROM1, mapping = aes(Timepoint,QDASH)) + 
 geom_boxplot()
 
-Rep1RCPROM2 <- ggplot(data = SelectRep1RCPROM2, mapping = aes(Timepoint,WORCNorm)) + 
+Rep6PROM2 <- ggplot(data = MasterTable2PROM1, mapping = aes(Timepoint,WOSINorm)) + 
 geom_boxplot()
 
-Rep1RCPROM3 <- ggplot(data = SelectRep1RCPROM2, mapping = aes(Timepoint,WORCPhysicalQ3)) + 
-geom_boxplot()
-
-Rep1RCPROM1 / Rep1RCPROM2 / Rep1RCPROM3
+Rep6PROM1 / Rep6PROM2
 
 ```
 
 ```{r}
-#| label: tbl-PROMs-Rep1
-#| tbl-cap: "Summary of PRULO Report 1 (Rotator Cuff) Cases - QuickDASH"
+#| label: tbl-TableRep65
+#| tbl-cap: "Summary of PRULO Report 6 (All) Cases - QuickDASH"
 
 
-TableRep1RC5 <- SelectRep1RCPROM1 |>
+TableRep65 <- MasterTable2PROM1 |>
 dplyr::select(
   QDASH,
   QDASHDelta,
+  WOSINorm,
+  WOSIDelta,
   Timepoint) |>
 tbl_summary(by = "Timepoint",
             missing = "no",
             type = list(
               QDASH ~ "continuous",
-              QDASHDelta ~ "continuous"
+              QDASHDelta ~ "continuous",
+              WOSINorm ~ "continuous",
+              WOSIDelta ~ "continuous"
             ),
             statistic = all_continuous() ~ "{median} ({p25} - {p75})"
-            ) 
+            )
 
-
-gtsummary::as_flex_table(TableRep1RC5) |> flextable::set_table_properties(
+gtsummary::as_flex_table(TableRep65) |> flextable::set_table_properties(
   layout = "autofit",
   width = 0.5,
   align = "center",
   opts_word = list(
-  split = TRUE
-  )
+    split = TRUE
+    )
 )
 
-
-
-```
-
-```{r}
-#| label: tbl-PROMs-Rep1Worc
-#| tbl-cap: "Summary of PRULO Report 1 (Rotator Cuff) Cases - Western Ontario Rotator Cuff Index"
-
-
-TableRep1RC6 <- SelectRep1RCPROM2 |>
-dplyr::select(WORCNorm,
-              WORCPhysicalQ3,
-              WORCDelta,
-              Timepoint) |>
-tbl_summary(by = "Timepoint",
-            missing = "no",
-            type = list(
-              WORCNorm ~ "continuous",
-              WORCPhysicalQ3 ~ "continuous",
-              WORCDelta ~ "continuous"
-            ),
-            statistic = all_continuous() ~ "{median} ({p25} - {p75})")  
-
-gtsummary::as_flex_table(TableRep1RC6) |> flextable::set_table_properties(
-  layout = "autofit",
-  width = 0.5,
-  align = "center",
-  opts_word = list(
-  split = TRUE
-  )
-)
 
 ```
