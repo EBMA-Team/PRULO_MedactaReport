@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.549">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Corey Scholes">
+<meta name="dcterms.date" content="2025-04-11">
+
+<title>PRULO_MedactaReport</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="PRULO_MedactaReport_files/libs/clipboard/clipboard.min.js"></script>
+<script src="PRULO_MedactaReport_files/libs/quarto-html/quarto.js"></script>
+<script src="PRULO_MedactaReport_files/libs/quarto-html/popper.min.js"></script>
+<script src="PRULO_MedactaReport_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="PRULO_MedactaReport_files/libs/quarto-html/anchor.min.js"></script>
+<link href="PRULO_MedactaReport_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="PRULO_MedactaReport_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="PRULO_MedactaReport_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="PRULO_MedactaReport_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="PRULO_MedactaReport_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<style>html{ scroll-behavior: smooth; }</style>
+<link href="PRULO_MedactaReport_files/libs/tabwid-1.1.3/tabwid.css" rel="stylesheet">
+<script src="PRULO_MedactaReport_files/libs/tabwid-1.1.3/tabwid.js"></script>
+<link href="PRULO_MedactaReport_files/libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
+<script src="PRULO_MedactaReport_files/libs/pagedtable-1.1/js/pagedtable.js"></script>
+
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article toc-left">
+<div id="quarto-sidebar-toc-left" class="sidebar toc-left">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul class="collapse">
+  <li><a href="#preamble" id="toc-preamble" class="nav-link active" data-scroll-target="#preamble"><span class="header-section-number">1</span> Preamble</a></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction"><span class="header-section-number">2</span> Introduction</a></li>
+  <li><a href="#glossary" id="toc-glossary" class="nav-link" data-scroll-target="#glossary"><span class="header-section-number">3</span> Glossary</a></li>
+  <li><a href="#data-preparation" id="toc-data-preparation" class="nav-link" data-scroll-target="#data-preparation"><span class="header-section-number">4</span> Data Preparation</a>
+  <ul class="collapse">
+  <li><a href="#load-libraries" id="toc-load-libraries" class="nav-link" data-scroll-target="#load-libraries"><span class="header-section-number">4.1</span> Load libraries</a></li>
+  <li><a href="#authorisations" id="toc-authorisations" class="nav-link" data-scroll-target="#authorisations"><span class="header-section-number">4.2</span> Authorisations</a></li>
+  <li><a href="#functions-for-processing" id="toc-functions-for-processing" class="nav-link" data-scroll-target="#functions-for-processing"><span class="header-section-number">4.3</span> Functions for Processing</a></li>
+  <li><a href="#import-inputs" id="toc-import-inputs" class="nav-link" data-scroll-target="#import-inputs"><span class="header-section-number">4.4</span> Import Inputs</a></li>
+  <li><a href="#combine-and-filter-for-3-month-follow-up" id="toc-combine-and-filter-for-3-month-follow-up" class="nav-link" data-scroll-target="#combine-and-filter-for-3-month-follow-up"><span class="header-section-number">4.5</span> Combine and Filter for 3 month follow up</a></li>
+  <li><a href="#prepare-dataset-for-procedure" id="toc-prepare-dataset-for-procedure" class="nav-link" data-scroll-target="#prepare-dataset-for-procedure"><span class="header-section-number">4.6</span> Prepare dataset for procedure</a></li>
+  <li><a href="#adjust-dataset-for-time-to-event" id="toc-adjust-dataset-for-time-to-event" class="nav-link" data-scroll-target="#adjust-dataset-for-time-to-event"><span class="header-section-number">4.7</span> Adjust dataset for time to event</a></li>
+  <li><a href="#prepare-product-groups-of-interest" id="toc-prepare-product-groups-of-interest" class="nav-link" data-scroll-target="#prepare-product-groups-of-interest"><span class="header-section-number">4.8</span> Prepare product groups of interest</a></li>
+  <li><a href="#adjust-patient-demographics-for-presentation" id="toc-adjust-patient-demographics-for-presentation" class="nav-link" data-scroll-target="#adjust-patient-demographics-for-presentation"><span class="header-section-number">4.9</span> Adjust patient demographics for presentation</a></li>
+  <li><a href="#prepare-patient-reported-outcomes" id="toc-prepare-patient-reported-outcomes" class="nav-link" data-scroll-target="#prepare-patient-reported-outcomes"><span class="header-section-number">4.10</span> Prepare Patient-Reported Outcomes</a></li>
+  <li><a href="#prepare-adverse-events" id="toc-prepare-adverse-events" class="nav-link" data-scroll-target="#prepare-adverse-events"><span class="header-section-number">4.11</span> Prepare adverse events</a></li>
+  </ul></li>
+  <li><a href="#prulo-summary" id="toc-prulo-summary" class="nav-link" data-scroll-target="#prulo-summary"><span class="header-section-number">5</span> PRULO Summary</a></li>
+  <li><a href="#product-report---jlock" id="toc-product-report---jlock" class="nav-link" data-scroll-target="#product-report---jlock"><span class="header-section-number">6</span> Product Report - JLock</a>
+  <ul class="collapse">
+  <li><a href="#overview" id="toc-overview" class="nav-link" data-scroll-target="#overview"><span class="header-section-number">6.1</span> Overview</a></li>
+  <li><a href="#procedure-report---all" id="toc-procedure-report---all" class="nav-link" data-scroll-target="#procedure-report---all"><span class="header-section-number">6.2</span> Procedure Report - All</a></li>
+  </ul></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="PRULO_MedactaReport.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li><li><a href="PRULO_MedactaReport.docx"><i class="bi bi-file-word"></i>MS Word</a></li></ul></div></nav>
+</div>
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">PRULO_MedactaReport</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Corey Scholes </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">April 11, 2025</p>
+    </div>
+  </div>
+  
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">July 23, 2025</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="preamble" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Preamble</h1>
+<p><strong>Author:</strong> Corey Scholes, EBM Analytics</p>
+<p><strong>Sponsors:</strong> Assoc Prof Kevin Eng and Prof Richard Page, Geelong Orthopaedics</p>
+<p><strong>EBMAReference</strong>: RC_MedactaReporting_KE010Sep25</p>
+<p><strong>Version:</strong> 1.0</p>
+</section>
+<section id="introduction" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Introduction</h1>
+<p>The surgeons from Geelong Orthopaedics participating in the Patient Registry of Upper Limb Pathology Outcomes (PRULO) specialise in joint replacement, sports injuries, upper limb and hand surgery, and trauma. The PRULO registry collates and stores patient outcomes collected routinely as part of the standard clinical pathway for upper limb pathology treatment.</p>
+<p>The registry comprises three patient cohorts: rotator cuff pathology, glenohumeral instability, and general shoulder pathologies. Outcomes data collected by the registry include objective joint function, patient reported outcomes (pain, satisfaction, quality of life), radiological findings, surgical treatment and rates of revision surgery or complications.</p>
+<p>The dataset is derived from the PRULO registry snapshot and live database tables. A <a href="https://academic.oup.com/jsprm/article/2023/4/snad014/7317733">protocol</a> has been previously prepared for the registry <span class="citation" data-cites="scholes2023">Scholes et al. (<a href="#ref-scholes2023" role="doc-biblioref">2023</a>)</span>.</p>
+</section>
+<section id="glossary" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Glossary</h1>
+<p>To clarify terms used throughout the report, a glossary is presented below.</p>
+<div id="tbl-glossary" class="quarto-float anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-glossary-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Glossary of terms used in report
+</figcaption>
+<div aria-describedby="tbl-glossary-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="table">
+<colgroup>
+<col style="width: 8%">
+<col style="width: 91%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Term</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Case Failure</td>
+<td><p>Patient presents in a state such that</p>
+<p>i) a repaired construct is deemed to be absent healing, or has reinjured subsequent to the index procedure</p>
+<p>ii) the shoulder presents in a state such that removal of hardware or procedure revision (single or multi-stage) is recommended</p></td>
+</tr>
+<tr class="even">
+<td>Reoperation</td>
+<td>A theatre procedure subsequent to the index surgery that does not involve removal, replacement or modification of the construct.</td>
+</tr>
+<tr class="odd">
+<td>Case</td>
+<td>A definitive reconstruction procedure performed on a patient, excluding a reoperation, but including revision procedures.</td>
+</tr>
+<tr class="even">
+<td>Revision Else</td>
+<td>A repeat definitive procedure performed on a case where the previous definitive procedure has been performed by another surgeon</td>
+</tr>
+<tr class="odd">
+<td>Revision Own</td>
+<td>A repeat definitive procedure performed on a case where the previous definitive procedure has been performed by the same contributing surgeon</td>
+</tr>
+<tr class="even">
+<td>QuickDASH</td>
+<td>Short form of the Disabilities of the Arm, Hand and Shoulder questionnaire. The questions are directed toward pain and disability associated with upper limb activities. A diminishing score over time reflects improved function.</td>
+</tr>
+<tr class="odd">
+<td>WORCNorm</td>
+<td>Western Ontario Rotator Cuff Index is a questionnaire specific to rotator cuff pathology and is scored as the sum of a series of 10mm visual analogue scales. A normalised score is calculated to convert the sum to a percentage score of normal (100%).</td>
+</tr>
+<tr class="even">
+<td>WORC Physical Question 3</td>
+<td>Question 3 of the Physical subscale of the WORC asks “How much weakness do you experience in your shoulder?” and is a</td>
+</tr>
+<tr class="odd">
+<td>WOSINorm</td>
+<td>Western Ontario Rotator Cuff Index is a questionnaire specific to glenohumeral instability and associated pathology and is scored as the sum of a series of 10mm visual analogue scales. A normalised score is calculated to convert the sum to a percentage score of normal (100%).</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+</section>
+<section id="data-preparation" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Data Preparation</h1>
+<p>The steps below outline the process for preparing registry data for analysis.</p>
+<section id="load-libraries" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="load-libraries"><span class="header-section-number">4.1</span> Load libraries</h2>
+<p>Load up required packages in advance.</p>
+</section>
+<section id="authorisations" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="authorisations"><span class="header-section-number">4.2</span> Authorisations</h2>
+<p>Pre-authorise access to registry datasets.</p>
+</section>
+<section id="functions-for-processing" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="functions-for-processing"><span class="header-section-number">4.3</span> Functions for Processing</h2>
+<p>Include a series of functions to call later in the file for processing data imports.</p>
+</section>
+<section id="import-inputs" class="level2" data-number="4.4">
+<h2 data-number="4.4" class="anchored" data-anchor-id="import-inputs"><span class="header-section-number">4.4</span> Import Inputs</h2>
+<p>Data was imported from the PRULO registry. Configuration tables were also loaded, including the product table to describe the products of interest and list identifiers to match to surgical records. The table was modified to include a material column (PEEK or BR) and product identifiers.</p>
+<div class="cell">
+<p>The snapshot date was 31-Aug-2025 and the report prepared 17-Sep-2025. The imported data contains a dataframe of 1417 cases returned from the Rotator Cuff cohort, a dataframe of 473 cases returned from the Glenohumeral Instability cohort and a dataframe of 1571 cases from the General cohort. An additional dataframe was retrieved of 4040 cases to generate the STROBE flow chart from the PRULO registry.</p>
+</div>
+</section>
+<section id="combine-and-filter-for-3-month-follow-up" class="level2" data-number="4.5">
+<h2 data-number="4.5" class="anchored" data-anchor-id="combine-and-filter-for-3-month-follow-up"><span class="header-section-number">4.5</span> Combine and Filter for 3 month follow up</h2>
+<p>The dataset was filtered to only include records with a minimum of 3 months follow up at the time of analysis.</p>
+</section>
+<section id="prepare-dataset-for-procedure" class="level2" data-number="4.6">
+<h2 data-number="4.6" class="anchored" data-anchor-id="prepare-dataset-for-procedure"><span class="header-section-number">4.6</span> Prepare dataset for procedure</h2>
+<p>Procedure data was combined from all cohorts. New columns were created based on conditional statements, cases were filtered where procedure data was unavailable (non-surgical, missing intraoperative data). Procedure data was further processed to standardise labels, categorised by structure (Rotator Cuff, Labrum, Capsule and Ligament) and adjunct procedures reorganised to account for variation across surgical indication.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-ProcedureCount" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-ProcedureCount-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="PRULO_MedactaReport_files/figure-html/fig-ProcedureCount-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ProcedureCount-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Summary of procedure terms included in registry output
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="adjust-dataset-for-time-to-event" class="level2" data-number="4.7">
+<h2 data-number="4.7" class="anchored" data-anchor-id="adjust-dataset-for-time-to-event"><span class="header-section-number">4.7</span> Adjust dataset for time to event</h2>
+<p>To account for variations in follow up, time to event was calculated between date of surgery and change of record status. Treatment record end was defined as any change in state such that the treatment would be considered no longer active, has not achieved its clinical purpose or is no longer relevant. For example, in the case of soft tissue repair, if the target tissue represents with a retear, or the construct presents in a state such that hardware removal or replacement is recommended, then the treatment record status is set to inactive and a new treatment record is created to capture the subsequent treatment. The treatments with inactive statuses were extracted to a shared file for review. The subsequent treatment was manually labelled to create the <em>Subsequent Treatment</em> variable.</p>
+<p>Additional numeric variables were calculated from inputs collected within the registry (e.g.&nbsp;Symptom Duration).</p>
+<p>Read in results of manual review of failure cases and categorise subsequent treatments.</p>
+</section>
+<section id="prepare-product-groups-of-interest" class="level2" data-number="4.8">
+<h2 data-number="4.8" class="anchored" data-anchor-id="prepare-product-groups-of-interest"><span class="header-section-number">4.8</span> Prepare product groups of interest</h2>
+<p>Tables were rearranged and the dataset was filtered against an ignore list created from the product configuration table. Regular expressions were used to match products of interest to intraoperative hardware information and to sum the instances of implantation for each product of interest.</p>
+</section>
+<section id="adjust-patient-demographics-for-presentation" class="level2" data-number="4.9">
+<h2 data-number="4.9" class="anchored" data-anchor-id="adjust-patient-demographics-for-presentation"><span class="header-section-number">4.9</span> Adjust patient demographics for presentation</h2>
+<p>Recode Sex for report presentation.</p>
+</section>
+<section id="prepare-patient-reported-outcomes" class="level2" data-number="4.10">
+<h2 data-number="4.10" class="anchored" data-anchor-id="prepare-patient-reported-outcomes"><span class="header-section-number">4.10</span> Prepare Patient-Reported Outcomes</h2>
+<p>The PRULO registry uses the QuickDASH <span class="citation" data-cites="gummesson2006">(<a href="#ref-gummesson2006" role="doc-biblioref">Gummesson, Ward, and Atroshi 2006</a>)</span> for all cases, Western Ontario Rotator Cuff Index (WORC) <span class="citation" data-cites="kirkley2003">(<a href="#ref-kirkley2003" role="doc-biblioref">Kirkley, Alvarez, and Griffin 2003</a>)</span> for records placed into the Rotator Cuff cohort and the Western Ontario Shoulder Instability Index (WOSI) <span class="citation" data-cites="kirkley1998">(<a href="#ref-kirkley1998" role="doc-biblioref">Kirkley et al. 1998</a>)</span> for records placed in the Glenohumeral Instability cohort to monitor patient-reported outcomes before and after surgery at defined time intervals. The metrics utilised for each questionnaire in this report are the total score (QuickDaSH) and the normalised total score (WORC and WOSI). A single question from the WORC was also presented (Question 3 of the Physical subscale) that asks “How much weakness do you experience in your shoulder?” to observe potential patterns relevant specifically to cuff repair. PROMs entries were restricted to cases where the treatment record was “eligible” for the time point. Tables were reshaped and variables refactored, with delta variables generated (difference to baseline at each followup) to enable plotting and table generation.</p>
+</section>
+<section id="prepare-adverse-events" class="level2" data-number="4.11">
+<h2 data-number="4.11" class="anchored" data-anchor-id="prepare-adverse-events"><span class="header-section-number">4.11</span> Prepare adverse events</h2>
+<p>Adverse events were monitored by near real-time chart review and surgical bookings. Events were added to the registry using an electronic form and linked to the treatment records. The data import was assessed for data entry validity, differences between date of event, date of reoperation and surgery date of the index treatment were calculated to assess date validity. Additional data preparation and cleaning was performed, which included filtering and standardizing key identifiers across multiple datasets. Missing values were identified to ensure data consistency. The adverse events were attached to the treatment data with filters applied to constrain to pertinent records and time periods. Time-based metrics were calculated and classification was performed based on the event descriptions using regular expressions. Finally, it conducted data quality checks, identifying potential discrepancies and duplicate entries. After the data transformation, the revised dataset was exported to an external file for review. The code then generated multiple subset datasets, each focusing on a specific type of complication and isolating the earliest occurrence for each unique treatment. This was used for retrieval for each product report.</p>
+<!--# Clean up live tables for complications. Assess date validity and correct data entry. -->
+<p>Split out into arrays to bounce against for each Product report</p>
+<!--# Review intraoperative complications manually for mechanism -->
+<p>Intraoperative complications were reviewed manually for mechanism.</p>
+</section>
+</section>
+<section id="prulo-summary" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> PRULO Summary</h1>
+<p>The diagram below summarises recruitment and categorisation of patients into the PRULO registry.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-strobe" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-strobe-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="PRULO_MedactaReport_files/figure-html/fig-strobe-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-strobe-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Flowchart of data extraction and case selection up to 3 months followup across each cohort
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div id="tbl-diagnosis" class="cell quarto-float anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-diagnosis-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: Summary of diagnoses using ICD-10 coding for primary presentation
+</figcaption>
+<div aria-describedby="tbl-diagnosis-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="do-not-create-environment cell table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Cohort</th>
+<th style="text-align: left;">ICD10</th>
+<th style="text-align: right;">n</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">General</td>
+<td style="text-align: left;">M75.6</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">General</td>
+<td style="text-align: left;">M24.0</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">General</td>
+<td style="text-align: left;">M75.5</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Glenohumeral Instability</td>
+<td style="text-align: left;">S43.0</td>
+<td style="text-align: right;">20</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Glenohumeral Instability</td>
+<td style="text-align: left;">S43.42</td>
+<td style="text-align: right;">14</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Glenohumeral Instability</td>
+<td style="text-align: left;">M24.4</td>
+<td style="text-align: right;">12</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Glenohumeral Instability</td>
+<td style="text-align: left;">M25.31</td>
+<td style="text-align: right;">7</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Glenohumeral Instability</td>
+<td style="text-align: left;">M24.21</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Rotator Cuff</td>
+<td style="text-align: left;">S46.0</td>
+<td style="text-align: right;">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>The table below summarises patient diagnoses in the PRULO registry. The primary pathology for a given presentation was derived from clinical notes and labelled with an ICD-10 (international) code. Each code was included in a configuration file to link to a registry cohort.</p>
+<div class="cell">
+<div id="tbl-surgical" class="cell quarto-float anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-surgical-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3: Summary of PRULO surgical cases by cohort
+</figcaption>
+<div aria-describedby="tbl-surgical-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div class="tabwid"><style>.cl-e2c10e26{table-layout:auto;width:15%;}.cl-e2b74b70{font-family:'Arial';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-e2b74b7a{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-e2b74b7b{font-family:'Arial';font-size:6.6pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;position: relative;bottom:3.3pt;}.cl-e2bb18a4{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:2pt;padding-top:2pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e2bb18b8{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:2pt;padding-top:2pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e2bb18b9{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e2bb18ba{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e2bb18c2{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:15pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e2bb18c3{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e2bb4572{background-color:transparent;vertical-align: middle;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 1pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e2bb457c{background-color:transparent;vertical-align: middle;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 1pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e2bb4586{background-color:transparent;vertical-align: middle;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 1pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e2bb4587{background-color:transparent;vertical-align: middle;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 1pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e2bb4588{background-color:transparent;vertical-align: middle;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 1pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e2bb4590{background-color:transparent;vertical-align: middle;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 1pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e2bb4591{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e2bb4592{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e2bb4593{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e2bb4594{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e2bb459a{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e2bb459b{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e2bb459c{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e2bb459d{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e2bb459e{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e2bb45a4{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e2bb45a5{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e2bb45a6{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e2bb45ae{background-color:transparent;vertical-align: top;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e2bb45af{background-color:transparent;vertical-align: top;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e2bb45b0{background-color:transparent;vertical-align: top;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e2bb45b1{background-color:transparent;vertical-align: top;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e2bb45b8{background-color:transparent;vertical-align: top;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e2bb45b9{background-color:transparent;vertical-align: top;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e2bb45ba{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e2bb45c2{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e2bb45c3{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e2bb45c4{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e2bb45c5{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e2bb45cc{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-e2c10e26"><thead><tr style="overflow-wrap:break-word;"><th class="cl-e2bb4572"><p class="cl-e2bb18a4"><span class="cl-e2b74b70">Characteristic</span></p></th><th class="cl-e2bb457c"><p class="cl-e2bb18b8"><span class="cl-e2b74b70">Statistic</span></p></th><th class="cl-e2bb4586"><p class="cl-e2bb18b8"><span class="cl-e2b74b70">Overall</span><span class="cl-e2b74b7a">  </span><br><span class="cl-e2b74b7a">N = 60</span><span class="cl-e2b74b7b">1</span></p></th><th class="cl-e2bb4587"><p class="cl-e2bb18b8"><span class="cl-e2b74b70">General</span><span class="cl-e2b74b7a">  </span><br><span class="cl-e2b74b7a">N = 4</span></p></th><th class="cl-e2bb4588"><p class="cl-e2bb18b8"><span class="cl-e2b74b70">Glenohumeral Instability</span><span class="cl-e2b74b7a">  </span><br><span class="cl-e2b74b7a">N = 55</span></p></th><th class="cl-e2bb4590"><p class="cl-e2bb18b8"><span class="cl-e2b74b70">Rotator Cuff</span><span class="cl-e2b74b7a">  </span><br><span class="cl-e2b74b7a">N = 1</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-e2bb4591"><p class="cl-e2bb18b9"><span class="cl-e2b74b7a">Age at Initial Consultation (Years)</span></p></td><td class="cl-e2bb4592"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">Median (Q1, Q3)</span></p></td><td class="cl-e2bb4593"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">28 (19, 35)</span></p></td><td class="cl-e2bb4594"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">31 (23, 39)</span></p></td><td class="cl-e2bb459a"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">27 (19, 35)</span></p></td><td class="cl-e2bb459b"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">59 (59, 59)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e2bb459c"><p class="cl-e2bb18b9"><span class="cl-e2b74b7a">Male</span></p></td><td class="cl-e2bb459d"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">% (n)</span></p></td><td class="cl-e2bb459e"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">72 (43)</span></p></td><td class="cl-e2bb45a4"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">50 (2)</span></p></td><td class="cl-e2bb45a5"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">73 (40)</span></p></td><td class="cl-e2bb45a6"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">100 (1)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e2bb459c"><p class="cl-e2bb18b9"><span class="cl-e2b74b7a">Dominant Side</span></p></td><td class="cl-e2bb459d"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">% (n)</span></p></td><td class="cl-e2bb459e"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">54 (25)</span></p></td><td class="cl-e2bb45a4"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">50 (2)</span></p></td><td class="cl-e2bb45a5"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">55 (23)</span></p></td><td class="cl-e2bb45a6"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">NA (0)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e2bb459c"><p class="cl-e2bb18b9"><span class="cl-e2b74b7a">Bilateral Presentation</span></p></td><td class="cl-e2bb459d"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">% (n)</span></p></td><td class="cl-e2bb459e"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">12 (7)</span></p></td><td class="cl-e2bb45a4"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">0 (0)</span></p></td><td class="cl-e2bb45a5"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">13 (7)</span></p></td><td class="cl-e2bb45a6"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">0 (0)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e2bb4591"><p class="cl-e2bb18b9"><span class="cl-e2b74b7a">Symptom Duration (Weeks)</span></p></td><td class="cl-e2bb4592"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">Median (Q1, Q3)</span></p></td><td class="cl-e2bb4593"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">81 (20, 291)</span></p></td><td class="cl-e2bb4594"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">278 (25, 531)</span></p></td><td class="cl-e2bb459a"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">81 (20, 262)</span></p></td><td class="cl-e2bb459b"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">NA (NA, NA)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e2bb459c"><p class="cl-e2bb18b9"><span class="cl-e2b74b7a">Symptom Duration Category</span><span class="cl-e2b74b7b">2</span></p></td><td class="cl-e2bb459d"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a"></span></p></td><td class="cl-e2bb459e"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a"></span></p></td><td class="cl-e2bb45a4"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a"></span></p></td><td class="cl-e2bb45a5"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a"></span></p></td><td class="cl-e2bb45a6"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a"></span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e2bb459c"><p class="cl-e2bb18c2"><span class="cl-e2b74b7a">&lt;=0.5</span></p></td><td class="cl-e2bb459d"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">% (n)</span></p></td><td class="cl-e2bb459e"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">29 (10)</span></p></td><td class="cl-e2bb45a4"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">50 (1)</span></p></td><td class="cl-e2bb45a5"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">27 (9)</span></p></td><td class="cl-e2bb45a6"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">NA (0)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e2bb459c"><p class="cl-e2bb18c2"><span class="cl-e2b74b7a">&gt;0.5</span></p></td><td class="cl-e2bb459d"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">% (n)</span></p></td><td class="cl-e2bb459e"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">71 (25)</span></p></td><td class="cl-e2bb45a4"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">50 (1)</span></p></td><td class="cl-e2bb45a5"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">73 (24)</span></p></td><td class="cl-e2bb45a6"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">NA (0)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e2bb459c"><p class="cl-e2bb18b9"><span class="cl-e2b74b7a">Treatment Record Active</span><span class="cl-e2b74b7b">3</span></p></td><td class="cl-e2bb459d"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">% (n)</span></p></td><td class="cl-e2bb459e"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">95 (57)</span></p></td><td class="cl-e2bb45a4"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">100 (4)</span></p></td><td class="cl-e2bb45a5"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">95 (52)</span></p></td><td class="cl-e2bb45a6"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">100 (1)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e2bb45ae"><p class="cl-e2bb18b9"><span class="cl-e2b74b7a">Patient Record Active</span><span class="cl-e2b74b7b">4</span></p></td><td class="cl-e2bb45af"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">% (n)</span></p></td><td class="cl-e2bb45b0"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">100 (60)</span></p></td><td class="cl-e2bb45b1"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">100 (4)</span></p></td><td class="cl-e2bb45b8"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">100 (55)</span></p></td><td class="cl-e2bb45b9"><p class="cl-e2bb18ba"><span class="cl-e2b74b7a">100 (1)</span></p></td></tr></tbody><tfoot><tr style="overflow-wrap:break-word;"><td colspan="6" class="cl-e2bb45ba"><p class="cl-e2bb18c3"><span class="cl-e2b74b7b">1</span><span class="cl-e2b74b7a">Median (Q1, Q3); % (n)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td colspan="6" class="cl-e2bb45ba"><p class="cl-e2bb18c3"><span class="cl-e2b74b7b">2</span><span class="cl-e2b74b7a">Dichotomised below or equal to 0.5 years or greater than 0.5 years</span></p></td></tr><tr style="overflow-wrap:break-word;"><td colspan="6" class="cl-e2bb45ba"><p class="cl-e2bb18c3"><span class="cl-e2b74b7b">3</span><span class="cl-e2b74b7a">Treatment record remains active - no change to follow up</span></p></td></tr><tr style="overflow-wrap:break-word;"><td colspan="6" class="cl-e2bb45ba"><p class="cl-e2bb18c3"><span class="cl-e2b74b7b">4</span><span class="cl-e2b74b7a">Patient record remains open - no change to consent or mortality status</span></p></td></tr></tfoot></table></div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<!--# Removed SymptomDurationCat - turning it into a factor was problematic when constructing the summary table with gtsummary-->
+<p>The overall registry enrolment is summarised in <a href="#tbl-surgical" class="quarto-xref">Table&nbsp;3</a>, describing how the population is summarised into cohorts.</p>
+</section>
+<section id="product-report---jlock" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Product Report - JLock</h1>
+<section id="overview" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="overview"><span class="header-section-number">6.1</span> Overview</h2>
+<p>Usage of the Product within the patient group is summarised below.</p>
+<div class="cell">
+<p>There are 61 cases involving the anchor of interest. Surgeries were performed between 2022-Jul-05 and 2025-Aug-19. The procedures included [Labrum Repair] [Remplissage; Labrum Repair; Capsular Shift] [Labrum Repair; Capsular Shift] [Remplissage; Labrum Repair] [Other] [Tenotomy; Labrum Repair], and [Tenodesis; Labrum Repair; Capsular Shift].</p>
+</div>
+</section>
+<section id="procedure-report---all" class="level2" data-number="6.2">
+<h2 data-number="6.2" class="anchored" data-anchor-id="procedure-report---all"><span class="header-section-number">6.2</span> Procedure Report - All</h2>
+<section id="patient-characteristics" class="level3" data-number="6.2.1">
+<h3 data-number="6.2.1" class="anchored" data-anchor-id="patient-characteristics"><span class="header-section-number">6.2.1</span> Patient Characteristics</h3>
+<p>Patient demographic, pathology, and treatment characteristics for this cohort receiving the Product are summarised below.</p>
+<div class="cell">
+<div id="tbl-demographics" class="cell quarto-float anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-demographics-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4: Summary of PRULO Report JLock (All) - Patient Characteristics
+</figcaption>
+<div aria-describedby="tbl-demographics-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div class="tabwid"><style>.cl-e397637c{table-layout:auto;width:50%;}.cl-e38e5584{font-family:'Arial';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-e38e558e{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-e38e5598{font-family:'Arial';font-size:6.6pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;position: relative;bottom:3.3pt;}.cl-e391b396{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:2pt;padding-top:2pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e391b3a0{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:2pt;padding-top:2pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e391b3aa{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e391b3ab{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e391b3ac{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:15pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e391b3b4{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e391d920{background-color:transparent;vertical-align: middle;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 1pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e391d92a{background-color:transparent;vertical-align: middle;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 1pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e391d934{background-color:transparent;vertical-align: middle;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 1pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e391d935{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e391d936{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e391d93e{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e391d93f{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e391d940{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e391d948{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e391d949{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e391d94a{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e391d952{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e391d953{background-color:transparent;vertical-align: top;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e391d954{background-color:transparent;vertical-align: top;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e391d95c{background-color:transparent;vertical-align: top;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e391d95d{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e391d95e{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e391d95f{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-e397637c"><thead><tr style="overflow-wrap:break-word;"><th class="cl-e391d920"><p class="cl-e391b396"><span class="cl-e38e5584">Characteristic</span></p></th><th class="cl-e391d92a"><p class="cl-e391b3a0"><span class="cl-e38e5584">Statistic</span></p></th><th class="cl-e391d934"><p class="cl-e391b3a0"><span class="cl-e38e5584">N = 61</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-e391d935"><p class="cl-e391b3aa"><span class="cl-e38e558e">Age at Initial Consultation (Years)</span></p></td><td class="cl-e391d936"><p class="cl-e391b3ab"><span class="cl-e38e558e">Median (Q1, Q3)</span></p></td><td class="cl-e391d93e"><p class="cl-e391b3ab"><span class="cl-e38e558e">28 (19, 35)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e391d93f"><p class="cl-e391b3aa"><span class="cl-e38e558e">Male</span></p></td><td class="cl-e391d940"><p class="cl-e391b3ab"><span class="cl-e38e558e">% (n)</span></p></td><td class="cl-e391d948"><p class="cl-e391b3ab"><span class="cl-e38e558e">72 (44)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e391d949"><p class="cl-e391b3aa"><span class="cl-e38e558e">Cohort</span></p></td><td class="cl-e391d94a"><p class="cl-e391b3ab"><span class="cl-e38e558e"></span></p></td><td class="cl-e391d952"><p class="cl-e391b3ab"><span class="cl-e38e558e"></span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e391d93f"><p class="cl-e391b3ac"><span class="cl-e38e558e">General</span></p></td><td class="cl-e391d940"><p class="cl-e391b3ab"><span class="cl-e38e558e">% (n)</span></p></td><td class="cl-e391d948"><p class="cl-e391b3ab"><span class="cl-e38e558e">6.6 (4)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e391d93f"><p class="cl-e391b3ac"><span class="cl-e38e558e">Glenohumeral Instability</span></p></td><td class="cl-e391d940"><p class="cl-e391b3ab"><span class="cl-e38e558e">% (n)</span></p></td><td class="cl-e391d948"><p class="cl-e391b3ab"><span class="cl-e38e558e">92 (56)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e391d93f"><p class="cl-e391b3ac"><span class="cl-e38e558e">Rotator Cuff</span></p></td><td class="cl-e391d940"><p class="cl-e391b3ab"><span class="cl-e38e558e">% (n)</span></p></td><td class="cl-e391d948"><p class="cl-e391b3ab"><span class="cl-e38e558e">1.6 (1)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e391d93f"><p class="cl-e391b3aa"><span class="cl-e38e558e">Dominant Side</span></p></td><td class="cl-e391d940"><p class="cl-e391b3ab"><span class="cl-e38e558e">% (n)</span></p></td><td class="cl-e391d948"><p class="cl-e391b3ab"><span class="cl-e38e558e">55 (26)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e391d93f"><p class="cl-e391b3aa"><span class="cl-e38e558e">Bilateral Presentation</span></p></td><td class="cl-e391d940"><p class="cl-e391b3ab"><span class="cl-e38e558e">% (n)</span></p></td><td class="cl-e391d948"><p class="cl-e391b3ab"><span class="cl-e38e558e">11 (7)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e391d935"><p class="cl-e391b3aa"><span class="cl-e38e558e">Symptom Duration (Weeks)</span></p></td><td class="cl-e391d936"><p class="cl-e391b3ab"><span class="cl-e38e558e">Median (Q1, Q3)</span></p></td><td class="cl-e391d93e"><p class="cl-e391b3ab"><span class="cl-e38e558e">81 (20, 291)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e391d93f"><p class="cl-e391b3aa"><span class="cl-e38e558e">Symptom Duration Category</span><span class="cl-e38e5598">1</span></p></td><td class="cl-e391d940"><p class="cl-e391b3ab"><span class="cl-e38e558e"></span></p></td><td class="cl-e391d948"><p class="cl-e391b3ab"><span class="cl-e38e558e"></span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e391d93f"><p class="cl-e391b3ac"><span class="cl-e38e558e">&lt;=0.5</span></p></td><td class="cl-e391d940"><p class="cl-e391b3ab"><span class="cl-e38e558e">% (n)</span></p></td><td class="cl-e391d948"><p class="cl-e391b3ab"><span class="cl-e38e558e">29 (10)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e391d93f"><p class="cl-e391b3ac"><span class="cl-e38e558e">&gt;0.5</span></p></td><td class="cl-e391d940"><p class="cl-e391b3ab"><span class="cl-e38e558e">% (n)</span></p></td><td class="cl-e391d948"><p class="cl-e391b3ab"><span class="cl-e38e558e">71 (25)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e391d93f"><p class="cl-e391b3aa"><span class="cl-e38e558e">Treatment Record Active</span><span class="cl-e38e5598">2</span></p></td><td class="cl-e391d940"><p class="cl-e391b3ab"><span class="cl-e38e558e">% (n)</span></p></td><td class="cl-e391d948"><p class="cl-e391b3ab"><span class="cl-e38e558e">93 (57)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e391d953"><p class="cl-e391b3aa"><span class="cl-e38e558e">Patient Record Active</span><span class="cl-e38e5598">3</span></p></td><td class="cl-e391d954"><p class="cl-e391b3ab"><span class="cl-e38e558e">% (n)</span></p></td><td class="cl-e391d95c"><p class="cl-e391b3ab"><span class="cl-e38e558e">100 (61)</span></p></td></tr></tbody><tfoot><tr style="overflow-wrap:break-word;"><td colspan="3" class="cl-e391d95d"><p class="cl-e391b3b4"><span class="cl-e38e5598">1</span><span class="cl-e38e558e">Dichotomised below or equal to 0.5 years or greater than 0.5 years</span></p></td></tr><tr style="overflow-wrap:break-word;"><td colspan="3" class="cl-e391d95d"><p class="cl-e391b3b4"><span class="cl-e38e5598">2</span><span class="cl-e38e558e">Treatment record remains active - no change to follow up</span></p></td></tr><tr style="overflow-wrap:break-word;"><td colspan="3" class="cl-e391d95d"><p class="cl-e391b3b4"><span class="cl-e38e5598">3</span><span class="cl-e38e558e">Patient record remains open - no change to consent or mortality status</span></p></td></tr></tfoot></table></div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section>
+<section id="surgical-details" class="level3" data-number="6.2.2">
+<h3 data-number="6.2.2" class="anchored" data-anchor-id="surgical-details"><span class="header-section-number">6.2.2</span> Surgical Details</h3>
+<p>Surgical findings and management strategies are summarised below.</p>
+<div class="cell">
+<div id="tbl-pathsurg" class="cell quarto-float anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-pathsurg-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;5: Summary of PRULO Report 6 (All) Cases Pathology and Surgical Details
+</figcaption>
+<div aria-describedby="tbl-pathsurg-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div class="tabwid"><style>.cl-e45bf264{table-layout:auto;width:50%;}.cl-e4530492{font-family:'Arial';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-e453049c{font-family:'Arial';font-size:6.6pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;position: relative;bottom:3.3pt;}.cl-e45304a6{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-e4565f16{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:2pt;padding-top:2pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e4565f20{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:2pt;padding-top:2pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e4565f21{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e4565f2a{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e4565f2b{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:15pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e4565f2c{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e4568284{background-color:transparent;vertical-align: middle;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 1pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e4568285{background-color:transparent;vertical-align: middle;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 1pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e456828e{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e456828f{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e4568298{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e4568299{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e456829a{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e45682a2{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e45682a3{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e45682a4{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e45682a5{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e45682ac{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e45682ad{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e45682b6{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e45682b7{background-color:transparent;vertical-align: top;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e45682b8{background-color:transparent;vertical-align: top;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e45682b9{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e45682ba{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-e45bf264"><thead><tr style="overflow-wrap:break-word;"><th class="cl-e4568284"><p class="cl-e4565f16"><span class="cl-e4530492">Characteristic</span></p></th><th class="cl-e4568285"><p class="cl-e4565f20"><span class="cl-e4530492">N = 61</span><span class="cl-e453049c">1</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-e456828e"><p class="cl-e4565f21"><span class="cl-e45304a6">Cuff Status</span></p></td><td class="cl-e456828f"><p class="cl-e4565f2a"><span class="cl-e45304a6"></span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e4568298"><p class="cl-e4565f2b"><span class="cl-e45304a6">Intact</span></p></td><td class="cl-e4568299"><p class="cl-e4565f2a"><span class="cl-e45304a6">98 (43)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e4568298"><p class="cl-e4565f2b"><span class="cl-e45304a6">Partial Tear</span></p></td><td class="cl-e4568299"><p class="cl-e4565f2a"><span class="cl-e45304a6">2.3 (1)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e456829a"><p class="cl-e4565f21"><span class="cl-e45304a6">Treatment Type</span></p></td><td class="cl-e45682a2"><p class="cl-e4565f2a"><span class="cl-e45304a6"></span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e4568298"><p class="cl-e4565f2b"><span class="cl-e45304a6">Primary</span></p></td><td class="cl-e4568299"><p class="cl-e4565f2a"><span class="cl-e45304a6">95 (58)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e4568298"><p class="cl-e4565f2b"><span class="cl-e45304a6">Revision Else</span></p></td><td class="cl-e4568299"><p class="cl-e4565f2a"><span class="cl-e45304a6">1.6 (1)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e4568298"><p class="cl-e4565f2b"><span class="cl-e45304a6">Revision Own</span></p></td><td class="cl-e4568299"><p class="cl-e4565f2a"><span class="cl-e45304a6">3.3 (2)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e45682a3"><p class="cl-e4565f21"><span class="cl-e45304a6">CuffRepair</span></p></td><td class="cl-e45682a4"><p class="cl-e4565f2a"><span class="cl-e45304a6"></span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e4568298"><p class="cl-e4565f2b"><span class="cl-e45304a6">None</span></p></td><td class="cl-e4568299"><p class="cl-e4565f2a"><span class="cl-e45304a6">82 (50)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e4568298"><p class="cl-e4565f2b"><span class="cl-e45304a6">Remplissage</span></p></td><td class="cl-e4568299"><p class="cl-e4565f2a"><span class="cl-e45304a6">18 (11)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e456829a"><p class="cl-e4565f21"><span class="cl-e45304a6">RepairAugmentation</span></p></td><td class="cl-e45682a2"><p class="cl-e4565f2a"><span class="cl-e45304a6"></span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e4568298"><p class="cl-e4565f2b"><span class="cl-e45304a6">None</span></p></td><td class="cl-e4568299"><p class="cl-e4565f2a"><span class="cl-e45304a6">100 (45)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e456829a"><p class="cl-e4565f21"><span class="cl-e45304a6">LongHeadBiceps</span></p></td><td class="cl-e45682a2"><p class="cl-e4565f2a"><span class="cl-e45304a6"></span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e4568298"><p class="cl-e4565f2b"><span class="cl-e45304a6">None</span></p></td><td class="cl-e4568299"><p class="cl-e4565f2a"><span class="cl-e45304a6">97 (59)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e4568298"><p class="cl-e4565f2b"><span class="cl-e45304a6">Tenodesis</span></p></td><td class="cl-e4568299"><p class="cl-e4565f2a"><span class="cl-e45304a6">1.6 (1)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e4568298"><p class="cl-e4565f2b"><span class="cl-e45304a6">Tenotomy</span></p></td><td class="cl-e4568299"><p class="cl-e4565f2a"><span class="cl-e45304a6">1.6 (1)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e45682a5"><p class="cl-e4565f21"><span class="cl-e45304a6">Labrum</span></p></td><td class="cl-e45682ac"><p class="cl-e4565f2a"><span class="cl-e45304a6"></span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e4568298"><p class="cl-e4565f2b"><span class="cl-e45304a6">Labrum Repair</span></p></td><td class="cl-e4568299"><p class="cl-e4565f2a"><span class="cl-e45304a6">74 (45)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e4568298"><p class="cl-e4565f2b"><span class="cl-e45304a6">None</span></p></td><td class="cl-e4568299"><p class="cl-e4565f2a"><span class="cl-e45304a6">26 (16)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e45682ad"><p class="cl-e4565f21"><span class="cl-e45304a6">LabrumRepair</span></p></td><td class="cl-e45682b6"><p class="cl-e4565f2a"><span class="cl-e45304a6"></span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e4568298"><p class="cl-e4565f2b"><span class="cl-e45304a6">Bankart</span></p></td><td class="cl-e4568299"><p class="cl-e4565f2a"><span class="cl-e45304a6">74 (32)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e4568298"><p class="cl-e4565f2b"><span class="cl-e45304a6">Not Repaired</span></p></td><td class="cl-e4568299"><p class="cl-e4565f2a"><span class="cl-e45304a6">2.3 (1)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e4568298"><p class="cl-e4565f2b"><span class="cl-e45304a6">Other</span><span class="cl-e453049c">2</span></p></td><td class="cl-e4568299"><p class="cl-e4565f2a"><span class="cl-e45304a6">7.0 (3)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e4568298"><p class="cl-e4565f2b"><span class="cl-e45304a6">Posterior</span></p></td><td class="cl-e4568299"><p class="cl-e4565f2a"><span class="cl-e45304a6">16 (7)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e4568298"><p class="cl-e4565f21"><span class="cl-e45304a6">CapsuleLigament</span></p></td><td class="cl-e4568299"><p class="cl-e4565f2a"><span class="cl-e45304a6"></span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e4568298"><p class="cl-e4565f2b"><span class="cl-e45304a6">Capsular Shift</span></p></td><td class="cl-e4568299"><p class="cl-e4565f2a"><span class="cl-e45304a6">46 (28)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e4568298"><p class="cl-e4565f2b"><span class="cl-e45304a6">None</span></p></td><td class="cl-e4568299"><p class="cl-e4565f2a"><span class="cl-e45304a6">52 (32)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e4568298"><p class="cl-e4565f2b"><span class="cl-e45304a6">Other</span><span class="cl-e453049c">2</span></p></td><td class="cl-e4568299"><p class="cl-e4565f2a"><span class="cl-e45304a6">1.6 (1)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e456828e"><p class="cl-e4565f21"><span class="cl-e45304a6">Glenoid</span></p></td><td class="cl-e456828f"><p class="cl-e4565f2a"><span class="cl-e45304a6"></span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e4568298"><p class="cl-e4565f2b"><span class="cl-e45304a6">Fracture fixation</span></p></td><td class="cl-e4568299"><p class="cl-e4565f2a"><span class="cl-e45304a6">4.3 (2)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e4568298"><p class="cl-e4565f2b"><span class="cl-e45304a6">None</span></p></td><td class="cl-e4568299"><p class="cl-e4565f2a"><span class="cl-e45304a6">96 (44)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e456829a"><p class="cl-e4565f21"><span class="cl-e45304a6">AdjunctProcedure</span></p></td><td class="cl-e45682a2"><p class="cl-e4565f2a"><span class="cl-e45304a6"></span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e4568298"><p class="cl-e4565f2b"><span class="cl-e45304a6">None</span></p></td><td class="cl-e4568299"><p class="cl-e4565f2a"><span class="cl-e45304a6">96 (44)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e45682b7"><p class="cl-e4565f2b"><span class="cl-e45304a6">Paralabral Cyst Excision</span></p></td><td class="cl-e45682b8"><p class="cl-e4565f2a"><span class="cl-e45304a6">4.3 (2)</span></p></td></tr></tbody><tfoot><tr style="overflow-wrap:break-word;"><td colspan="2" class="cl-e45682b9"><p class="cl-e4565f2c"><span class="cl-e453049c">1</span><span class="cl-e45304a6">% (n)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td colspan="2" class="cl-e45682b9"><p class="cl-e4565f2c"><span class="cl-e453049c">2</span><span class="cl-e45304a6">Labral tear uncategorised</span></p></td></tr></tfoot></table></div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section>
+<section id="treatment-survival" class="level3" data-number="6.2.3">
+<h3 data-number="6.2.3" class="anchored" data-anchor-id="treatment-survival"><span class="header-section-number">6.2.3</span> Treatment Survival</h3>
+<div class="cell">
+<p>The mean follow up duration is 1.5 years, with a standard deviation of 0.94 years.</p>
+</div>
+<p>Failure or revision events as identified in the registry for this cohort are summarised below. Individual failure data can be accessed in <a href="https://docs.google.com/spreadsheets/d/https://docs.google.com/spreadsheets/d/1ESVvSKAv8ma11kri9pby6OEU9Gk5Z3UnF6XwjXBTcTg/edit">Attachment 1</a>.</p>
+<div class="cell">
+<div id="tbl-procsurvival" class="cell quarto-float anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-procsurvival-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;6: Summary of PRULO Report (All) Cases - Procedure Survival
+</figcaption>
+<div aria-describedby="tbl-procsurvival-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div class="tabwid"><style>.cl-e4bf7df2{table-layout:auto;width:50%;}.cl-e4b72a1c{font-family:'Arial';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-e4b72a26{font-family:'Arial';font-size:6.6pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;position: relative;bottom:3.3pt;}.cl-e4b72a30{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-e4ba59d0{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:2pt;padding-top:2pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e4ba59d1{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:2pt;padding-top:2pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e4ba59da{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e4ba59db{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e4ba59dc{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e4ba79b0{background-color:transparent;vertical-align: middle;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 1pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e4ba79b1{background-color:transparent;vertical-align: middle;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 1pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e4ba79ba{background-color:transparent;vertical-align: middle;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 1pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e4ba79bb{background-color:transparent;vertical-align: top;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e4ba79bc{background-color:transparent;vertical-align: top;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e4ba79bd{background-color:transparent;vertical-align: top;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e4ba79be{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e4ba79c4{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e4ba79c5{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-e4bf7df2"><thead><tr style="overflow-wrap:break-word;"><th class="cl-e4ba79b0"><p class="cl-e4ba59d0"><span class="cl-e4b72a1c">Characteristic</span></p></th><th class="cl-e4ba79b1"><p class="cl-e4ba59d1"><span class="cl-e4b72a1c">1 Weeks</span><span class="cl-e4b72a26">1</span></p></th><th class="cl-e4ba79ba"><p class="cl-e4ba59d1"><span class="cl-e4b72a1c">26 Weeks</span><span class="cl-e4b72a26">1</span></p></th><th class="cl-e4ba79ba"><p class="cl-e4ba59d1"><span class="cl-e4b72a1c">52 Weeks</span><span class="cl-e4b72a26">1</span></p></th><th class="cl-e4ba79ba"><p class="cl-e4ba59d1"><span class="cl-e4b72a1c">104 Weeks</span><span class="cl-e4b72a26">1</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-e4ba79bb"><p class="cl-e4ba59da"><span class="cl-e4b72a30">Procedure Survival</span></p></td><td class="cl-e4ba79bc"><p class="cl-e4ba59db"><span class="cl-e4b72a30">100% (100% - 100%)</span></p></td><td class="cl-e4ba79bd"><p class="cl-e4ba59db"><span class="cl-e4b72a30">98% (94% - 100%)</span></p></td><td class="cl-e4ba79bd"><p class="cl-e4ba59db"><span class="cl-e4b72a30">96% (90% - 100%)</span></p></td><td class="cl-e4ba79bd"><p class="cl-e4ba59db"><span class="cl-e4b72a30">93% (85% - 100%)</span></p></td></tr></tbody><tfoot><tr style="overflow-wrap:break-word;"><td colspan="5" class="cl-e4ba79be"><p class="cl-e4ba59dc"><span class="cl-e4b72a26">1</span><span class="cl-e4b72a30">% survival with 95% confidence intervals</span></p></td></tr></tfoot></table></div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<div class="cell">
+<p>1Qxi8d45TDNet2d5-FYliyzgXsSW8Dx73A0oe4GPg0RI</p>
+</div>
+</section>
+<section id="adverse-events" class="level3" data-number="6.2.4">
+<h3 data-number="6.2.4" class="anchored" data-anchor-id="adverse-events"><span class="header-section-number">6.2.4</span> Adverse Events</h3>
+<p>Complications and adverse events are summarised below. Individual reoperation data can be accessed in <a href="https://docs.google.com/spreadsheets/d/1ESVvSKAv8ma11kri9pby6OEU9Gk5Z3UnF6XwjXBTcTg/edit#gid=0">Attachment 1</a>.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="umkafdagyi" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#umkafdagyi table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#umkafdagyi thead, #umkafdagyi tbody, #umkafdagyi tfoot, #umkafdagyi tr, #umkafdagyi td, #umkafdagyi th {
+  border-style: none;
+}
+
+#umkafdagyi p {
+  margin: 0;
+  padding: 0;
+}
+
+#umkafdagyi .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#umkafdagyi .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#umkafdagyi .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#umkafdagyi .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#umkafdagyi .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#umkafdagyi .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#umkafdagyi .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#umkafdagyi .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#umkafdagyi .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#umkafdagyi .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#umkafdagyi .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#umkafdagyi .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#umkafdagyi .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#umkafdagyi .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#umkafdagyi .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#umkafdagyi .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#umkafdagyi .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#umkafdagyi .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#umkafdagyi .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#umkafdagyi .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#umkafdagyi .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#umkafdagyi .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#umkafdagyi .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#umkafdagyi .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#umkafdagyi .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#umkafdagyi .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#umkafdagyi .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#umkafdagyi .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#umkafdagyi .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#umkafdagyi .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#umkafdagyi .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#umkafdagyi .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#umkafdagyi .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#umkafdagyi .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#umkafdagyi .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#umkafdagyi .gt_left {
+  text-align: left;
+}
+
+#umkafdagyi .gt_center {
+  text-align: center;
+}
+
+#umkafdagyi .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#umkafdagyi .gt_font_normal {
+  font-weight: normal;
+}
+
+#umkafdagyi .gt_font_bold {
+  font-weight: bold;
+}
+
+#umkafdagyi .gt_font_italic {
+  font-style: italic;
+}
+
+#umkafdagyi .gt_super {
+  font-size: 65%;
+}
+
+#umkafdagyi .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#umkafdagyi .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#umkafdagyi .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#umkafdagyi .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#umkafdagyi .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#umkafdagyi .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#umkafdagyi .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#umkafdagyi .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#umkafdagyi div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+<tr class="header gt_col_headings">
+<th id="TreatmentID" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">TreatmentID</th>
+<th id="Description" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Description</th>
+<th id="Intervention" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Intervention</th>
+<th id="PostopManagement" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">PostopManagement</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_right" headers="TreatmentID">2360.2</td>
+<td class="gt_row gt_left" headers="Description">prior stabilisation, removed prior sutures</td>
+<td class="gt_row gt_left" headers="Intervention">None required</td>
+<td class="gt_row gt_left" headers="PostopManagement">No</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right" headers="TreatmentID">2729.1</td>
+<td class="gt_row gt_left" headers="Description">grphon anchor came out</td>
+<td class="gt_row gt_left" headers="Intervention">Modified surgical technique</td>
+<td class="gt_row gt_left" headers="PostopManagement">No</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right" headers="TreatmentID">3295.1</td>
+<td class="gt_row gt_left" headers="Description">bottom screw had no bite</td>
+<td class="gt_row gt_left" headers="Intervention">None required</td>
+<td class="gt_row gt_left" headers="PostopManagement">No</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div id="tbl-TableRep4" class="cell quarto-float anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-TableRep4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;7: Summary of PRULO Report Cases - Postoperative Events
+</figcaption>
+<div aria-describedby="tbl-TableRep4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div class="tabwid"><style>.cl-e6791f18{table-layout:auto;width:50%;}.cl-e6701314{font-family:'Arial';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-e6701328{font-family:'Arial';font-size:6.6pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;position: relative;bottom:3.3pt;}.cl-e6701329{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-e6739250{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:2pt;padding-top:2pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e673925a{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:2pt;padding-top:2pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e6739264{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e6739265{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e673926e{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:15pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e673926f{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e673b73a{background-color:transparent;vertical-align: middle;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 1pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e673b744{background-color:transparent;vertical-align: middle;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 1pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e673b745{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e673b74e{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e673b74f{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e673b750{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e673b751{background-color:transparent;vertical-align: top;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e673b758{background-color:transparent;vertical-align: top;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e673b762{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e673b763{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-e6791f18"><thead><tr style="overflow-wrap:break-word;"><th class="cl-e673b73a"><p class="cl-e6739250"><span class="cl-e6701314">Characteristic</span></p></th><th class="cl-e673b744"><p class="cl-e673925a"><span class="cl-e6701314">N = 61</span><span class="cl-e6701328">1</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-e673b745"><p class="cl-e6739264"><span class="cl-e6701329">Infection</span></p></td><td class="cl-e673b74e"><p class="cl-e6739265"><span class="cl-e6701329">0 (0)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e673b745"><p class="cl-e6739264"><span class="cl-e6701329">Ligament|Tendon (Retear)</span></p></td><td class="cl-e673b74e"><p class="cl-e6739265"><span class="cl-e6701329">0 (0)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e673b745"><p class="cl-e6739264"><span class="cl-e6701329">Effusion</span></p></td><td class="cl-e673b74e"><p class="cl-e6739265"><span class="cl-e6701329">0 (0)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e673b745"><p class="cl-e6739264"><span class="cl-e6701329">Pain</span></p></td><td class="cl-e673b74e"><p class="cl-e6739265"><span class="cl-e6701329">2 (1)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e673b745"><p class="cl-e6739264"><span class="cl-e6701329">Hardware</span></p></td><td class="cl-e673b74e"><p class="cl-e6739265"><span class="cl-e6701329">2 (1)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e673b745"><p class="cl-e6739264"><span class="cl-e6701329">Loosening</span></p></td><td class="cl-e673b74e"><p class="cl-e6739265"><span class="cl-e6701329">5 (3)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e673b745"><p class="cl-e6739264"><span class="cl-e6701329">Instability</span></p></td><td class="cl-e673b74e"><p class="cl-e6739265"><span class="cl-e6701329">0 (0)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e673b745"><p class="cl-e6739264"><span class="cl-e6701329">Stiffness</span></p></td><td class="cl-e673b74e"><p class="cl-e6739265"><span class="cl-e6701329">13 (8)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e673b745"><p class="cl-e6739264"><span class="cl-e6701329">Neurological</span></p></td><td class="cl-e673b74e"><p class="cl-e6739265"><span class="cl-e6701329">0 (0)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e673b745"><p class="cl-e6739264"><span class="cl-e6701329">Thrombosis</span></p></td><td class="cl-e673b74e"><p class="cl-e6739265"><span class="cl-e6701329">0 (0)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e673b745"><p class="cl-e6739264"><span class="cl-e6701329">Other</span></p></td><td class="cl-e673b74e"><p class="cl-e6739265"><span class="cl-e6701329">2 (1)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e673b745"><p class="cl-e6739264"><span class="cl-e6701329">Reoperation</span><span class="cl-e6701328">2</span></p></td><td class="cl-e673b74e"><p class="cl-e6739265"><span class="cl-e6701329">5 (3)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e673b74f"><p class="cl-e6739264"><span class="cl-e6701329">Subsequent Treatment</span><span class="cl-e6701328">3</span></p></td><td class="cl-e673b750"><p class="cl-e6739265"><span class="cl-e6701329"></span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e673b745"><p class="cl-e673926e"><span class="cl-e6701329">Hardware Removal</span></p></td><td class="cl-e673b74e"><p class="cl-e6739265"><span class="cl-e6701329">2 (1)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e673b745"><p class="cl-e673926e"><span class="cl-e6701329">Nonoperative Management</span></p></td><td class="cl-e673b74e"><p class="cl-e6739265"><span class="cl-e6701329">3 (2)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e673b745"><p class="cl-e673926e"><span class="cl-e6701329">Not Applicable</span></p></td><td class="cl-e673b74e"><p class="cl-e6739265"><span class="cl-e6701329">95 (58)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e673b751"><p class="cl-e6739264"><span class="cl-e6701329">Reoperation Delay (Weeks)</span><span class="cl-e6701328">4</span></p></td><td class="cl-e673b758"><p class="cl-e6739265"><span class="cl-e6701329">34.5 (33.2)</span></p></td></tr></tbody><tfoot><tr style="overflow-wrap:break-word;"><td colspan="2" class="cl-e673b762"><p class="cl-e673926f"><span class="cl-e6701328">1</span><span class="cl-e6701329">% (n); Mean (SD)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td colspan="2" class="cl-e673b762"><p class="cl-e673926f"><span class="cl-e6701328">2</span><span class="cl-e6701329">A theatre procedure subsequent to the index surgery that does not involve removal, replacement or modification of the construct.</span></p></td></tr><tr style="overflow-wrap:break-word;"><td colspan="2" class="cl-e673b762"><p class="cl-e673926f"><span class="cl-e6701328">3</span><span class="cl-e6701329">Management undertaken for procedures that have suffered tissue failure or required hardware removal or replacement</span></p></td></tr><tr style="overflow-wrap:break-word;"><td colspan="2" class="cl-e673b762"><p class="cl-e673926f"><span class="cl-e6701328">4</span><span class="cl-e6701329">Time between index procedure and reoperation</span></p></td></tr></tfoot></table></div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>Write reoperations to external sheet</p>
+<div class="cell">
+<p>1Qxi8d45TDNet2d5-FYliyzgXsSW8Dx73A0oe4GPg0RI</p>
+</div>
+</section>
+<section id="patient-reported-outcomes" class="level3" data-number="6.2.5">
+<h3 data-number="6.2.5" class="anchored" data-anchor-id="patient-reported-outcomes"><span class="header-section-number">6.2.5</span> Patient-Reported Outcomes</h3>
+<p>Complete case analysis of QDASH and WOSI Index Normalised is summarised below.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-PROMRep6" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-PROMRep6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="PRULO_MedactaReport_files/figure-html/fig-PROMRep6-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-PROMRep6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Complete case analysis of QDASH(Top), WOSI Index (Bottom)
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div id="tbl-TableRep65" class="cell quarto-float anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-TableRep65-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;8: Summary of PRULO Report 6 (All) Cases - QuickDASH
+</figcaption>
+<div aria-describedby="tbl-TableRep65-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div class="tabwid"><style>.cl-e8130870{table-layout:auto;width:50%;}.cl-e809a096{font-family:'Arial';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-e809a0a0{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-e809a0a1{font-family:'Arial';font-size:6.6pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;position: relative;bottom:3.3pt;}.cl-e80d7cac{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:2pt;padding-top:2pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e80d7cb6{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:2pt;padding-top:2pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e80d7cc0{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e80d7cc1{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e80d7cc2{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e80d9e44{background-color:transparent;vertical-align: middle;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 1pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e80d9e4e{background-color:transparent;vertical-align: middle;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 1pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e80d9e4f{background-color:transparent;vertical-align: middle;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 1pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e80d9e50{background-color:transparent;vertical-align: middle;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 1pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e80d9e58{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e80d9e59{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e80d9e5a{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e80d9e5b{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e80d9e5c{background-color:transparent;vertical-align: top;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e80d9e62{background-color:transparent;vertical-align: top;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e80d9e63{background-color:transparent;vertical-align: top;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e80d9e64{background-color:transparent;vertical-align: top;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e80d9e65{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e80d9e6c{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e80d9e6d{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e80d9e6e{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-e8130870"><thead><tr style="overflow-wrap:break-word;"><th class="cl-e80d9e44"><p class="cl-e80d7cac"><span class="cl-e809a096">Characteristic</span></p></th><th class="cl-e80d9e4e"><p class="cl-e80d7cb6"><span class="cl-e809a096">Preop</span><span class="cl-e809a0a0">  </span><br><span class="cl-e809a0a0">N = 61</span><span class="cl-e809a0a1">1</span></p></th><th class="cl-e80d9e4f"><p class="cl-e80d7cb6"><span class="cl-e809a096">3m</span><span class="cl-e809a0a0">  </span><br><span class="cl-e809a0a0">N = 55</span><span class="cl-e809a0a1">1</span></p></th><th class="cl-e80d9e50"><p class="cl-e80d7cb6"><span class="cl-e809a096">6m</span><span class="cl-e809a0a0">  </span><br><span class="cl-e809a0a0">N = 51</span><span class="cl-e809a0a1">1</span></p></th><th class="cl-e80d9e50"><p class="cl-e80d7cb6"><span class="cl-e809a096">12m</span><span class="cl-e809a0a0">  </span><br><span class="cl-e809a0a0">N = 42</span><span class="cl-e809a0a1">1</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-e80d9e58"><p class="cl-e80d7cc0"><span class="cl-e809a0a0">QDASH</span></p></td><td class="cl-e80d9e59"><p class="cl-e80d7cc1"><span class="cl-e809a0a0">30 (20 - 52)</span></p></td><td class="cl-e80d9e5a"><p class="cl-e80d7cc1"><span class="cl-e809a0a0">27 (18 - 45)</span></p></td><td class="cl-e80d9e5b"><p class="cl-e80d7cc1"><span class="cl-e809a0a0">7 (0 - 18)</span></p></td><td class="cl-e80d9e5b"><p class="cl-e80d7cc1"><span class="cl-e809a0a0">8 (0 - 23)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e80d9e58"><p class="cl-e80d7cc0"><span class="cl-e809a0a0">QDASHDelta</span></p></td><td class="cl-e80d9e59"><p class="cl-e80d7cc1"><span class="cl-e809a0a0">NA (NA - NA)</span></p></td><td class="cl-e80d9e5a"><p class="cl-e80d7cc1"><span class="cl-e809a0a0">2 (-9 - 18)</span></p></td><td class="cl-e80d9e5b"><p class="cl-e80d7cc1"><span class="cl-e809a0a0">18 (7 - 36)</span></p></td><td class="cl-e80d9e5b"><p class="cl-e80d7cc1"><span class="cl-e809a0a0">13 (7 - 30)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e80d9e58"><p class="cl-e80d7cc0"><span class="cl-e809a0a0">WOSINorm</span></p></td><td class="cl-e80d9e59"><p class="cl-e80d7cc1"><span class="cl-e809a0a0">40 (27 - 63)</span></p></td><td class="cl-e80d9e5a"><p class="cl-e80d7cc1"><span class="cl-e809a0a0">63 (47 - 75)</span></p></td><td class="cl-e80d9e5b"><p class="cl-e80d7cc1"><span class="cl-e809a0a0">81 (64 - 94)</span></p></td><td class="cl-e80d9e5b"><p class="cl-e80d7cc1"><span class="cl-e809a0a0">69 (45 - 76)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e80d9e5c"><p class="cl-e80d7cc0"><span class="cl-e809a0a0">WOSIDelta</span></p></td><td class="cl-e80d9e62"><p class="cl-e80d7cc1"><span class="cl-e809a0a0">NA (NA - NA)</span></p></td><td class="cl-e80d9e63"><p class="cl-e80d7cc1"><span class="cl-e809a0a0">-57 (-73 - -34)</span></p></td><td class="cl-e80d9e64"><p class="cl-e80d7cc1"><span class="cl-e809a0a0">32 (18 - 64)</span></p></td><td class="cl-e80d9e64"><p class="cl-e80d7cc1"><span class="cl-e809a0a0">23 (18 - 41)</span></p></td></tr></tbody><tfoot><tr style="overflow-wrap:break-word;"><td colspan="5" class="cl-e80d9e65"><p class="cl-e80d7cc2"><span class="cl-e809a0a1">1</span><span class="cl-e809a0a0">Median (Q1 - Q3)</span></p></td></tr></tfoot></table></div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+
+</section>
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-gummesson2006" class="csl-entry" role="listitem">
+Gummesson, Christina, Michael M Ward, and Isam Atroshi. 2006. <span>“The Shortened Disabilities of the Arm, Shoulder and Hand Questionnaire (Quick DASH): Validity and Reliability Based on Responses Within the Full-Length DASH.”</span> <em>BMC Musculoskeletal Disorders</em> 7 (1). <a href="https://doi.org/10.1186/1471-2474-7-44">https://doi.org/10.1186/1471-2474-7-44</a>.
+</div>
+<div id="ref-kirkley2003" class="csl-entry" role="listitem">
+Kirkley, Alexandra, Christine Alvarez, and Sharon Griffin. 2003. <span>“The Development and Evaluation of a Disease-Specific Quality-of-Life Questionnaire for Disorders of the Rotator Cuff: The Western Ontario Rotator Cuff Index.”</span> <em>Clinical Journal of Sport Medicine</em> 13 (2): 84–92. <a href="https://doi.org/10.1097/00042752-200303000-00004">https://doi.org/10.1097/00042752-200303000-00004</a>.
+</div>
+<div id="ref-kirkley1998" class="csl-entry" role="listitem">
+Kirkley, Alexandra, Sharon Griffin, Heidi McLintock, and Linda Ng. 1998. <span>“The Development and Evaluation of a Disease-Specific Quality of Life Measurement Tool for Shoulder Instability.”</span> <em>The American Journal of Sports Medicine</em> 26 (6): 764–72. <a href="https://doi.org/10.1177/03635465980260060501">https://doi.org/10.1177/03635465980260060501</a>.
+</div>
+<div id="ref-scholes2023" class="csl-entry" role="listitem">
+Scholes, Corey, Kevin Eng, Meredith Harrison-Brown, Milad Ebrahimi, Graeme Brown, Stephen Gill, and Richard Page. 2023. <span>“Patient Registry of Upper Limb Outcomes (PRULO): A Protocol for an Orthopaedic Clinical Quality Registry to Monitor Treatment Outcomes.”</span> <em>Journal of Surgical Protocols and Research Methodologies</em> 2023 (4). <a href="https://doi.org/10.1093/jsprm/snad014">https://doi.org/10.1093/jsprm/snad014</a>.
+</div>
+</div></section></div></main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+          // default icon
+          link.classList.add("external");
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+<script src="PRULO_MedactaReport_files/libs/quarto-html/zenscroll-min.js"></script>
+</body></html>
