@@ -32,6 +32,7 @@ execute:
   message: false
 ---
 
+
 # Preamble
 
 **Author:** Corey Scholes, EBM Analytics
@@ -92,6 +93,7 @@ The steps below outline the process for preparing registry data for analysis.
 
 Load up required packages in advance.
 
+
 ```{r}
 #| label: Load packages
 
@@ -148,9 +150,11 @@ pacman::p_load(
 
 ```
 
+
 ## Authorisations
 
 Pre-authorise access to registry datasets.
+
 
 ```{r}
 #| label: Authorisations
@@ -165,9 +169,11 @@ drive_auth(cache = ".secrets", email = TRUE)
 
 ```
 
+
 ## Functions for Processing
 
 Include a series of functions to call later in the file for processing data imports.
+
 
 ```{r}
 #| label: Snapshot-folder
@@ -311,9 +317,11 @@ Generate_selectrep <- function(config_list, ProductTable, SnapshotComb4,
 }
 ```
 
+
 ## Import Inputs
 
 Data was imported from the PRULO registry. Configuration tables were also loaded, including the product table to describe the products of interest and list identifiers to match to surgical records. The table was modified to include a material column (PEEK or BR) and product identifiers.
+
 
 ```{r}
 #| label: Specify-sources
@@ -476,9 +484,11 @@ FormattedDate <- format(SnapshotDate, "%d-%b-%Y")} and the report prepared {form
 
 ```
 
+
 ## Combine and Filter for 3 month follow up
 
 The dataset was filtered to only include records with a minimum of 3 months follow up at the time of analysis.
+
 
 ```{r}
 ## Slice inputs for columns and rows
@@ -523,9 +533,11 @@ SnapshotComb <- SnapshotRC |> dplyr::select(-(c(ExternalStudyTag,Email,Phone))) 
 
 ```
 
+
 ## Prepare dataset for procedure
 
 Procedure data was combined from all cohorts. New columns were created based on conditional statements, cases were filtered where procedure data was unavailable (non-surgical, missing intraoperative data). Procedure data was further processed to standardise labels, categorised by structure (Rotator Cuff, Labrum, Capsule and Ligament) and adjunct procedures reorganised to account for variation across surgical indication.
+
 
 ```{r}
 #| label: snapshot-comb1
@@ -1012,11 +1024,13 @@ SnapshotComb1a <- left_join(
 )
 ```
 
+
 ## Adjust dataset for time to event
 
 To account for variations in follow up, time to event was calculated between date of surgery and change of record status. Treatment record end was defined as any change in state such that the treatment would be considered no longer active, has not achieved its clinical purpose or is no longer relevant. For example, in the case of soft tissue repair, if the target tissue represents with a retear, or the construct presents in a state such that hardware removal or replacement is recommended, then the treatment record status is set to inactive and a new treatment record is created to capture the subsequent treatment. The treatments with inactive statuses were extracted to a shared file for review. The subsequent treatment was manually labelled to create the *Subsequent Treatment* variable.
 
 Additional numeric variables were calculated from inputs collected within the registry (e.g. Symptom Duration).
+
 
 ```{r}
 #| label: Survival-prep-1
@@ -1079,7 +1093,9 @@ with_gs4_quiet(googlesheets4::range_write(
 )
 ```
 
+
 Read in results of manual review of failure cases and categorise subsequent treatments.
+
 
 ```{r}
 
@@ -1151,9 +1167,11 @@ SnapshotCombCheck <- SnapshotComb2a |> dplyr::select(
 )
 ```
 
+
 ## Prepare product groups of interest
 
 Tables were rearranged and the dataset was filtered against an ignore list created from the product configuration table. Regular expressions were used to match products of interest to intraoperative hardware information and to sum the instances of implantation for each product of interest.
+
 
 ```{r}
 #| label: Product-usage
@@ -1194,9 +1212,11 @@ MasterTable <- SnapshotComb2a |> filter(
 
 ```
 
+
 ## Adjust patient demographics for presentation
 
 Recode Sex for report presentation.
+
 
 ```{r}
 MasterTable1 <- MasterTable |> mutate(
@@ -1210,9 +1230,11 @@ MasterTable1 <- MasterTable |> mutate(
 )
 ```
 
+
 ## Prepare Patient-Reported Outcomes
 
 The PRULO registry uses the QuickDASH [@gummesson2006] for all cases, Western Ontario Rotator Cuff Index (WORC) [@kirkley2003] for records placed into the Rotator Cuff cohort and the Western Ontario Shoulder Instability Index (WOSI) [@kirkley1998] for records placed in the Glenohumeral Instability cohort to monitor patient-reported outcomes before and after surgery at defined time intervals. The metrics utilised for each questionnaire in this report are the total score (QuickDaSH) and the normalised total score (WORC and WOSI). A single question from the WORC was also presented (Question 3 of the Physical subscale) that asks "How much weakness do you experience in your shoulder?" to observe potential patterns relevant specifically to cuff repair. PROMs entries were restricted to cases where the treatment record was "eligible" for the time point. Tables were reshaped and variables refactored, with delta variables generated (difference to baseline at each followup) to enable plotting and table generation.
+
 
 ```{r}
 #| label: Proms-prep
@@ -1340,9 +1362,11 @@ MasterPROM1 <- MasterPROM |>
 
 ```
 
+
 ## Prepare adverse events
 
 Adverse events were monitored by near real-time chart review and surgical bookings. Events were added to the registry using an electronic form and linked to the treatment records. The data import was assessed for data entry validity, differences between date of event, date of reoperation and surgery date of the index treatment were calculated to assess date validity. Additional data preparation and cleaning was performed, which included filtering and standardizing key identifiers across multiple datasets. Missing values were identified to ensure data consistency. The adverse events were attached to the treatment data with filters applied to constrain to pertinent records and time periods. Time-based metrics were calculated and classification was performed based on the event descriptions using regular expressions. Finally, it conducted data quality checks, identifying potential discrepancies and duplicate entries. After the data transformation, the revised dataset was exported to an external file for review. The code then generated multiple subset datasets, each focusing on a specific type of complication and isolating the earliest occurrence for each unique treatment. This was used for retrieval for each product report.
+
 
 ```{r}
 #| label:  Complications-intraop
@@ -1407,7 +1431,9 @@ There are {nrow(MasterTable1 |> filter(is.na(TreatmentID)))} cases with missing 
 
 ```
 
+
 <!--# Clean up live tables for complications. Assess date validity and correct data entry. -->
+
 
 ```{r}
 mismatched_rows <- ComplicTable1[!(ComplicTable1$TreatmentID %in% MasterTable1$TreatmentID), ]
@@ -1538,7 +1564,9 @@ with_gs4_quiet(googlesheets4::range_write(
 )
 ```
 
+
 Split out into arrays to bounce against for each Product report
+
 
 ```{r}
 
@@ -1559,9 +1587,11 @@ ComplicReop <- ComplicTable3 |> group_by(TreatmentID) |> filter(`Reoperation Pro
 
 ```
 
+
 <!--# Review intraoperative complications manually for mechanism -->
 
 Intraoperative complications were reviewed manually for mechanism.
+
 
 ```{r}
 #| label: Complication-discrepancies
@@ -1611,9 +1641,11 @@ with_gs4_quiet(googlesheets4::range_write(
  )
 ```
 
+
 # PRULO Summary
 
 The diagram below summarises recruitment and categorisation of patients into the PRULO registry.
+
 
 ```{r}
 #| label: strobe-input
@@ -1726,7 +1758,9 @@ knitr::kable(TableData)
 
 ```
 
+
 The table below summarises patient diagnoses in the PRULO registry. The primary pathology for a given presentation was derived from clinical notes and labelled with an ICD-10 (international) code. Each code was included in a configuration file to link to a registry cohort.
+
 
 ```{r}
 #| label: tbl-surgical
@@ -1808,6 +1842,7 @@ gtsummary::as_flex_table(TableRepB) |> flextable::set_table_properties(
 
 ```
 
+
 <!--# Removed SymptomDurationCat - turning it into a factor was problematic when constructing the summary table with gtsummary-->
 
 The overall registry enrolment is summarised in @tbl-surgical, describing how the population is summarised into cohorts.
@@ -1817,6 +1852,7 @@ The overall registry enrolment is summarised in @tbl-surgical, describing how th
 ## Overview
 
 Usage of the Product within the patient group is summarised below.
+
 
 ```{epoxy}
 #| label:  Overview-Rep
@@ -1842,7 +1878,9 @@ Usage of the Product within the patient group is summarised below.
 
 ```
 
+
 ## Procedure Report - All
+
 
 ```{r}
 #| label: Slice-stack-2
@@ -1882,9 +1920,11 @@ MasterTable2 <- MasterTable1 |> mutate(
 )
 ```
 
+
 ### Patient Characteristics
 
 Patient demographic, pathology, and treatment characteristics for this cohort receiving the Product are summarised below.
+
 
 ```{r}
 #| label: tbl-demographics
@@ -1968,9 +2008,11 @@ gtsummary::as_flex_table(TableRep) |> flextable::set_table_properties(
 
 ```
 
+
 ### Surgical Details
 
 Surgical findings and management strategies are summarised below.
+
 
 ```{r}
 #| label: tbl-pathsurg
@@ -2010,7 +2052,9 @@ gtsummary::as_flex_table(TableRep2) |> flextable::set_table_properties(
 )
 ```
 
+
 ### Treatment Survival
+
 
 ```{epoxy}
 #| label:  Duration
@@ -2020,7 +2064,9 @@ The mean follow up duration is {round(MasterTable2 |> ungroup() |> summarise(mea
 
 ```
 
+
 Failure or revision events as identified in the registry for this cohort are summarised below. Individual failure data can be accessed in [Attachment 1](https://docs.google.com/spreadsheets/d/https://docs.google.com/spreadsheets/d/1ESVvSKAv8ma11kri9pby6OEU9Gk5Z3UnF6XwjXBTcTg/edit).
+
 
 ```{r}
 #| label: tbl-procsurvival
@@ -2098,9 +2144,11 @@ FailuresRep <-
 
 ```
 
+
 ### Adverse Events
 
 Complications and adverse events are summarised below. Individual reoperation data can be accessed in [Attachment 1](https://docs.google.com/spreadsheets/d/1ESVvSKAv8ma11kri9pby6OEU9Gk5Z3UnF6XwjXBTcTg/edit#gid=0).
+
 
 ```{r}
 #| label: IntraopComp - Rep
@@ -2264,7 +2312,9 @@ MasterTable2Reop <- ComplicTable3 |> filter(
 
 ```
 
+
 Write reoperations to external sheet
+
 
 ```{epoxy}
 #| label: Reoperations-Report-2
@@ -2288,9 +2338,11 @@ Write reoperations to external sheet
 
 ```
 
+
 ### Patient-Reported Outcomes
 
 Complete case analysis of QDASH and WOSI Index Normalised is summarised below.
+
 
 ```{r}
 #| label: fig-PROMRep6
@@ -2341,3 +2393,4 @@ gtsummary::as_flex_table(TableRep65) |> flextable::set_table_properties(
 
 
 ```
+
