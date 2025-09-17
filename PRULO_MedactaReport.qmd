@@ -326,7 +326,7 @@ SheetIDs <- list(
   PROMsMaster = "https://docs.google.com/spreadsheets/d/1zyFuf0Wmij13ELTYNmdi_BprF8hU4QSCPsNZ0EYRXzo/edit",
   TargetTerms = "https://docs.google.com/spreadsheets/d/1ESVvSKAv8ma11kri9pby6OEU9Gk5Z3UnF6XwjXBTcTg/edit",
   AuditResults = "https://docs.google.com/spreadsheets/d/1GyHw8hyyOcqkSzxlQL_hlxyvFR_a1jS3LzYc2B_y_fA/edit",
-  AuditReport = "https://docs.google.com/spreadsheets/d/1ESVvSKAv8ma11kri9pby6OEU9Gk5Z3UnF6XwjXBTcTg/edit"
+  AuditReport = "https://docs.google.com/spreadsheets/d/1Qxi8d45TDNet2d5-FYliyzgXsSW8Dx73A0oe4GPg0RI/edit"
   
 )
 
@@ -1839,21 +1839,6 @@ Usage of the Product within the patient group is summarised below.
   }
 }
 
-# {ifelse(nrow(MasterTable1) <= 1,
-#         epoxy::epoxy("There is {nrow(MasterTable1)} case(s) involving the anchor of interest and a Bankart repair. There is insufficient sample size to provide a report."),
-#         ifelse(dplyr::between(nrow(MasterTable2BR),2,5),
-#         epoxy::epoxy("There are {nrow(MasterTable2BR)} cases involving the anchor of interest and a Bankart repair. Surgeries were performed between {format(min(MasterTable2BR$DateTreatment),'%Y-%b-%d')} to {format(max(MasterTable2BR$DateTreatment),'%Y-%b-%d')}. There is insufficient sample size to provide a report."),
-#         epoxy::epoxy("There are {nrow(MasterTable2BR)} cases involving the anchor of interest and a Bankart repair. Surgeries were performed between {format(min(MasterTable2BR$DateTreatment),'%Y-%b-%d')} to {format(max(MasterTable2BR$DateTreatment),'%Y-%b-%d')}."
-#         )))} 
-# 
-# {ifelse(nrow(MasterTable2SLAP) == 1,
-#         epoxy::epoxy("There is {nrow(MasterTable2SLAP)} case(s) involving the anchor of interest and a SLAP repair. There is insufficient sample size to provide a report."),
-#         ifelse(dplyr::between(nrow(MasterTable2SLAP),2,5),
-#         epoxy::epoxy("There are {nrow(MasterTable2SLAP)} cases involving the anchor of interest and a SLAP repair. Surgeries were performed between {format(min(MasterTable2SLAP$DateTreatment),'%Y-%b-%d')} to {format(max(MasterTable2SLAP$DateTreatment),'%Y-%b-%d')}. There is insufficient sample size to provide a report."),
-#         epoxy::epoxy("There are {nrow(MasterTable2SLAP)} cases involving the anchor of interest and a SLAP repair. Surgeries were performed between {format(min(MasterTable2SLAP$DateTreatment),'%Y-%b-%d')} to {format(max(MasterTable2SLAP$DateTreatment),'%Y-%b-%d')}."
-# )))} 
-
-
 ```
 
 ## Procedure Report - All
@@ -1890,6 +1875,9 @@ MasterTable2 <- MasterTable1 |> mutate(
     EventDelay
   ),
   by = "TreatmentID"
+) |> dplyr::distinct( #maybe have a look at this in the future, its a duplicate complication coming across I think 506.1
+  TreatmentID,
+  .keep_all = TRUE
 )
 ```
 
@@ -1902,7 +1890,7 @@ Patient demographic, pathology, and treatment characteristics for this cohort re
 #| tbl-cap: "Summary of PRULO Report JLock (All) - Patient Characteristics"
 
 TableRep <-
-  MasterTable1 |> mutate(
+  MasterTable2 |> mutate(
     SurgeonA = case_when(
       Surgeon == "KE" ~ "A",
       Surgeon == "RP" ~ "B",
@@ -2308,13 +2296,13 @@ Complete case analysis of QDASH and WOSI Index Normalised is summarised below.
 #| fig-cap: "Complete case analysis of QDASH(Top), WOSI Index (Bottom)"
 
 
-Rep6PROM1 <- ggplot(data = MasterTable2PROM1, mapping = aes(Timepoint,QDASH)) + 
+RepPROM1 <- ggplot(data = MasterPROM1, mapping = aes(Timepoint,QDASH)) + 
 geom_boxplot()
 
-Rep6PROM2 <- ggplot(data = MasterTable2PROM1, mapping = aes(Timepoint,WOSINorm)) + 
+RepPROM2 <- ggplot(data = MasterPROM1, mapping = aes(Timepoint,WOSINorm)) + 
 geom_boxplot()
 
-Rep6PROM1 / Rep6PROM2
+RepPROM1 / RepPROM2
 
 ```
 
@@ -2323,7 +2311,7 @@ Rep6PROM1 / Rep6PROM2
 #| tbl-cap: "Summary of PRULO Report 6 (All) Cases - QuickDASH"
 
 
-TableRep65 <- MasterTable2PROM1 |>
+TableRep65 <- MasterPROM1 |>
 dplyr::select(
   QDASH,
   QDASHDelta,
