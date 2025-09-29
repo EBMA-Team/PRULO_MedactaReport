@@ -12,7 +12,8 @@ format:
     df-print: paged
     toc: true
     toc-depth: 2
-    toc-location: left
+    toc-expand: true
+    toc-location: right-body
     link-external-icon: true
     link-external-newwindow: true
     smooth-scroll: true
@@ -1613,7 +1614,7 @@ The diagram below summarises recruitment and categorisation of patients into the
 # After "induction"
 # - Patient withdraws consent
 # - Treatment fails before analysis date
-# - Not eligible for 12m followup
+# - Not eligible for 3m followup
 # 
 
 STROBEFlow <- STROBEInput |> dplyr::filter(
@@ -1624,8 +1625,7 @@ STROBEFlow <- STROBEInput |> dplyr::filter(
     CombID,
     DateInitialExamination,
     EligibleAtPreop,
-    EligibleAtx3months,
-    EligibleAtx12months
+    EligibleAtx3months
   ),
   by = "TreatmentID"
 ) |> dplyr::mutate(
@@ -1638,8 +1638,7 @@ STROBEFlow <- STROBEInput |> dplyr::filter(
   exclusion2 = case_when(
     is.na(exclusion1) & stringr::str_detect(RegistryStatus,"Opt-out") ~ "Patient Opt-Out",
     is.na(exclusion1) & stringr::str_detect(ImplantCodes,"05.10.002") ~ NA_character_,
-    #is.na(exclusion1) & Surgeon != "RP" ~ "Other Surgeon",
-    is.na(exclusion1) & stringr::str_detect(ImplantCodes,"05.10.002", negate = TRUE) | is.na(ImplantCodes) ~ "No hardware of interest"
+    (is.na(exclusion1) & stringr::str_detect(ImplantCodes,"05.10.002", negate = TRUE)) | (is.na(exclusion1) & is.na(ImplantCodes)) ~ "No hardware of interest"
   ),
   followup = if_else(
     is.na(exclusion1) & is.na(exclusion2),
@@ -1667,6 +1666,9 @@ STROBEFlow <- STROBEInput |> dplyr::filter(
 ```{r}
 #| label: fig-strobe
 #| fig-cap: "Flowchart of data extraction and case selection up to 3 months followup across each cohort"
+#| eval: false
+
+
 
 STROBEPlot <- consort::consort_plot(
   data = STROBEFlow,
@@ -2328,3 +2330,53 @@ gtsummary::as_flex_table(TableRep65) |> flextable::set_table_properties(
 
 
 ```
+
+
+## Discrepancies
+
+
+
+```{r}
+#| label: Read-live-tables
+#| eval: false
+
+
+# Authenticate for sheets using the same token
+gs4_auth(token = drive_token())
+
+
+PROMsMaster <- googlesheets4::sheet_write(
+  data = MasterTable2 |> dplyr::filter(
+    Labrum == "None"
+  ) |> left_join(
+    PatientTable |> dplyr::select(
+      PatientID,
+      FirstName,
+      LastName
+    ),
+    by = "PatientID"
+  ) |> dplyr::select(
+    TreatmentID,
+    DateTreatment,
+    AffectedSide,
+    FirstName,
+    LastName,
+    DateOfBirth
+  ) ,
+  ss = SheetIDs$AuditResults,
+  sheet = "MedactaDiscrepancy"
+)
+
+```
+
+```{r}
+
+MedactaDiscrep <- MasterTable2 |> dplyr::filter(
+    Labrum == "None"
+  ) |> dplyr::select(
+    TreatmentID,
+    Labrum
+  )
+
+```
+
