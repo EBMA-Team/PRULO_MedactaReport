@@ -11,7 +11,7 @@ format:
   html:
     df-print: paged
     toc: true
-    toc-depth: 2
+    toc-depth: 1
     toc-expand: true
     toc-location: right-body
     link-external-icon: true
@@ -1635,20 +1635,30 @@ STROBEFlow <- STROBEInput |> dplyr::filter(
     SurgicalTreatment == "Surgical" ~ NA_character_,
     .default = "Not a surgical treatment"
   ),
+  induction = if_else(
+    !is.na(exclusion1),
+    NA_character_,
+    TreatmentID
+  ),
   exclusion2 = case_when(
-    is.na(exclusion1) & stringr::str_detect(RegistryStatus,"Opt-out") ~ "Patient Opt-Out",
-    is.na(exclusion1) & stringr::str_detect(ImplantCodes,"05.10.002") ~ NA_character_,
-    (is.na(exclusion1) & stringr::str_detect(ImplantCodes,"05.10.002", negate = TRUE)) | (is.na(exclusion1) & is.na(ImplantCodes)) ~ "No hardware of interest"
+    !is.na(induction) & stringr::str_detect(RegistryStatus,"Opt-out") ~ "Patient Opt-Out",
+    !is.na(induction) & stringr::str_detect(ImplantCodes,"05.10.002") ~ NA_character_,
+    (!is.na(induction) & stringr::str_detect(ImplantCodes,"05.10.002", negate = TRUE)) | (!is.na(induction) & is.na(ImplantCodes)) ~ "No hardware of interest"
   ),
   followup = if_else(
-    is.na(exclusion1) & is.na(exclusion2),
+    !is.na(induction) & is.na(exclusion2),
     TreatmentID,
     NA_character_
   ),
+  arm3 = if_else(
+    !is.na(followup),
+    RegistryCohortName,
+    NA_character_
+  ),
   lost_followup = case_when(
-    is.na(exclusion1) & is.na(exclusion2) & TreatmentStatus == "Failed" & (ymd(DateStatusChange) < ymd(SnapshotDate)) ~ "Repair failure",
-    is.na(exclusion1) & is.na(exclusion2) & TreatmentStatus == "No further followup" & (ymd(DateStatusChange) < ymd(SnapshotDate)) ~ "Patient Opt-out",
-    is.na(exclusion1) & is.na(exclusion2) & TreatmentStatus == "Ongoing" & is.na(EligibleAtx3months) ~ "Not eligible for followup"
+    !is.na(induction) & is.na(exclusion2) & TreatmentStatus == "Failed" & (ymd(DateStatusChange) < ymd(SnapshotDate)) ~ "Repair failure",
+    !is.na(induction) & is.na(exclusion2) & TreatmentStatus == "No further followup" & (ymd(DateStatusChange) < ymd(SnapshotDate)) ~ "Patient Opt-out",
+    !is.na(induction) & is.na(exclusion2) & TreatmentStatus == "Ongoing" & is.na(EligibleAtx3months) ~ "Not eligible for followup"
   ),
   mitt = if_else(
     !is.na(followup) & is.na(lost_followup),
@@ -1656,8 +1666,7 @@ STROBEFlow <- STROBEInput |> dplyr::filter(
     NA_character_
 )
 ) |> dplyr::rename(
-  trialno = "TreatmentID",
-  arm3 = "RegistryCohortName"
+  trialno = "TreatmentID"
 )
 
 
@@ -1666,7 +1675,7 @@ STROBEFlow <- STROBEInput |> dplyr::filter(
 ```{r}
 #| label: fig-strobe
 #| fig-cap: "Flowchart of data extraction and case selection up to 3 months followup across each cohort"
-#| eval: false
+#| eval: true
 
 
 
@@ -1675,23 +1684,29 @@ STROBEPlot <- consort::consort_plot(
   orders = c(
     trialno = "Population",
     exclusion1 = "Excluded",
-    trialno = "Received Surgery",
+    induction = "Received Surgery",
     exclusion2 = "Excluded from Sample",
     followup = "Study Sample at Baseline",
     arm3 = "Diagnostic Group",
     lost_followup = "Unavailable 3m",
     mitt = "Final Analysis"),
 side_box = c(
-  "exclusion1", 
+  "exclusion1",
   "exclusion2",
   "lost_followup"
   ),
 allocation = "arm3",
-cex = 0.7
+cex = 0.7,
+kickoff_sidebox = TRUE
 )
 
 knitr::knit_print(STROBEPlot)
 ```
+
+
+
+
+
 
 ```{r}
 #| label: tbl-diagnosis
@@ -2332,7 +2347,6 @@ gtsummary::as_flex_table(TableRep65) |> flextable::set_table_properties(
 ```
 
 
-## Discrepancies
 
 
 
