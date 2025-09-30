@@ -1438,7 +1438,7 @@ na_in_SnapshotComb2a <- sum(is.na(SnapshotComb2a$TreatmentID))
 <!--# Clean up live tables for complications. Assess date validity and correct data entry. -->
 
 ```{r}
-mismatched_rows <- ComplicTable1[!(ComplicTable1$TreatmentID %in% MasterTable1$TreatmentID), ]
+mismatched_rows <- ComplicTable1[!(ComplicTable1$TreatmentID %in% MasterTable$TreatmentID), ]
 
 # Remove non-matching rows from ComplicTable2
 ComplicTable2 <- ComplicTable1 |>
