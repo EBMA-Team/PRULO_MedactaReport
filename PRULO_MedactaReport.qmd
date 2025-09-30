@@ -1031,21 +1031,21 @@ SnapshotComb2 <- SnapshotComb1a |> mutate(
 ) 
  )
 
-# |> dplyr::mutate(
-#   factor(levels = c("<=0.5", ">0.5"), exclude = NULL)
-```
-
-```{r}
-#| eval: true
-
-# Authenticate for sheets using the same token
-gs4_auth(token = drive_token())
-
 
 SnapshotCombFail <- SnapshotComb2 |> dplyr::filter(
   TreatmentStatus == "Failed",
   SurgicalTreatment == "Surgical"
 )
+
+# |> dplyr::mutate(
+#   factor(levels = c("<=0.5", ">0.5"), exclude = NULL)
+```
+
+```{r}
+#| eval: false
+
+# Authenticate for sheets using the same token
+gs4_auth(token = drive_token())
 
 with_gs4_quiet(googlesheets4::range_write(
   ss = SheetIDs$AuditResults,
@@ -1093,7 +1093,7 @@ SnapshotSubseq <- SnapshotComb2 |> dplyr::filter(
 ```
 
 ```{r}
-#| eval: true
+#| eval: false
 
 # Authenticate for sheets using the same token
 gs4_auth(token = drive_token())
@@ -1104,6 +1104,12 @@ SnapshotRevision <- googlesheets4::range_read(
   range = "A1:H",
   col_types = "ccDcccDc"
 )
+
+
+```
+
+
+```{r}
 
 SnapshotComb2a <- left_join(
   SnapshotComb2,
@@ -1141,7 +1147,7 @@ SnapshotCombCheck <- SnapshotComb2a |> dplyr::select(
 
 ## Prepare patient group of interest
 
-Tables were rearranged and the dataset was filtered against an ignore list created from the product configuration table. Regular expressions were used to match products of interest to intraoperative hardware information and to sum the instances of implantation for each product of interest.
+Tables were rearranged and the dataset was filtered for cases receiving the hardware of interest.
 
 ```{r}
 #| label: strobe-input
@@ -1239,7 +1245,7 @@ MasterTable <- SnapshotComb2a |> filter(
 
 ## Prepare Patient-Reported Outcomes
 
-The PRULO registry uses the QuickDASH [@gummesson2006] for all cases, Western Ontario Rotator Cuff Index (WORC) [@kirkley2003] for records placed into the Rotator Cuff cohort and the Western Ontario Shoulder Instability Index (WOSI) [@kirkley1998] for records placed in the Glenohumeral Instability cohort to monitor patient-reported outcomes before and after surgery at defined time intervals. The metrics utilised for each questionnaire in this report are the total score (QuickDaSH) and the normalised total score (WORC and WOSI). A single question from the WORC was also presented (Question 3 of the Physical subscale) that asks "How much weakness do you experience in your shoulder?" to observe potential patterns relevant specifically to cuff repair. PROMs entries were restricted to cases where the treatment record was "eligible" for the time point. Tables were reshaped and variables refactored, with delta variables generated (difference to baseline at each followup) to enable plotting and table generation.
+The PRULO registry uses the QuickDASH [@gummesson2006] for all cases, Western Ontario Rotator Cuff Index (WORC) [@kirkley2003] for records placed into the Rotator Cuff cohort and the Western Ontario Shoulder Instability Index (WOSI) [@kirkley1998] for records placed in the Glenohumeral Instability cohort to monitor patient-reported outcomes before and after surgery at defined time intervals. The metrics utilised for each questionnaire in this report are the total score (QuickDaSH) and the normalised total score (WORC and WOSI). PROMs entries were restricted to cases where the treatment record was "eligible" for the time point. Tables were reshaped and variables refactored, with delta variables generated (difference to baseline at each followup) to enable plotting and table generation.
 
 ```{r}
 #| label: Proms-prep
