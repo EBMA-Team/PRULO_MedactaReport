@@ -1108,7 +1108,6 @@ SnapshotRevision <- googlesheets4::range_read(
 
 ```
 
-
 ```{r}
 
 SnapshotComb2a <- left_join(
@@ -1218,7 +1217,6 @@ STROBEFlow <- STROBEInput |> dplyr::filter(
 
 ```
 
-
 Reduce to master table and adjust sex for report presentation
 
 ```{r}
@@ -1239,9 +1237,6 @@ MasterTable <- SnapshotComb2a |> filter(
 
 
 ```
-
-
-
 
 ## Prepare Patient-Reported Outcomes
 
@@ -1432,8 +1427,6 @@ na_in_ComplicTable1 <- sum(is.na(ComplicTable1$TreatmentID))
 na_in_SnapshotComb2a <- sum(is.na(SnapshotComb2a$TreatmentID))
 
 ```
-
-
 
 <!--# Clean up live tables for complications. Assess date validity and correct data entry. -->
 
@@ -1643,8 +1636,6 @@ with_gs4_quiet(googlesheets4::range_write(
 
 The diagram below summarises recruitment and categorisation of patients into the PRULO registry.
 
-
-
 ```{r}
 #| label: fig-strobe
 #| fig-cap: "Flowchart of data extraction and case selection up to 3 months followup across each cohort"
@@ -1676,16 +1667,11 @@ kickoff_sidebox = TRUE
 knitr::knit_print(STROBEPlot)
 ```
 
-
-
-
-
-
 ```{r}
 #| label: tbl-diagnosis
 #| tbl-cap: "Summary of diagnoses using ICD-10 coding for primary presentation"
 
-DiagnosisData <- MasterTable1  |> mutate(
+DiagnosisData <- MasterTable  |> mutate(
     ICD10 = stringr::str_extract(DiagnosisPrimary,"^[A-Za-z]+[0-9.]+")
   )
 
@@ -1701,7 +1687,6 @@ knitr::kable(TableData)
 
 ```
 
-
 The overall registry enrolment is summarised in @tbl-surgical, describing how the population is summarised into cohorts.
 
 # Product Report - JLock
@@ -1714,10 +1699,10 @@ Usage of the Product within the patient group is summarised below.
 #| label:  Overview-Rep
 
 {
-  if(nrow(MasterTable1) == 1) {
+  if(nrow(MasterTable) == 1) {
     epoxy::epoxy("There is {nrow(MasterTable1)} case involving the anchor of interest.")
   } else {
-    procedures <- unique(MasterTable1$ProcedureTotal)
+    procedures <- unique(MasterTable$ProcedureTotal)
     procedures <- procedures[procedures != "None" & procedures != "Unknown" & procedures != ""]
     procedures <- procedures[!grepl("^(Tenodesis|Tenotomy)$", procedures)]
     
@@ -1728,7 +1713,7 @@ Usage of the Product within the patient group is summarised below.
       procedures
     }
     
-    epoxy::epoxy("There are {nrow(MasterTable1)} cases involving the anchor of interest. Surgeries were performed between {format(min(MasterTable1$DateTreatment),'%Y-%b-%d')} and {format(max(MasterTable1$DateTreatment),'%Y-%b-%d')}. The procedures included [{procedures_string}].")
+    epoxy::epoxy("There are {nrow(MasterTable)} cases involving the anchor of interest. Surgeries were performed between {format(min(MasterTable$DateTreatment),'%Y-%b-%d')} and {format(max(MasterTable$DateTreatment),'%Y-%b-%d')}. The procedures included [{procedures_string}].")
   }
 }
 
@@ -1910,7 +1895,7 @@ gtsummary::as_flex_table(TableRep2) |> flextable::set_table_properties(
 #| label:  Duration
 
 
-The mean follow up duration is {round(MasterTable1 |> ungroup() |> summarise(mean = mean(Duration))/52,1)} years, with a standard deviation of {round(MasterTable2 |> ungroup() |> summarise(sd = sd(Duration))/52,2)} years.
+The mean follow up duration is {round(MasterTable1 |> ungroup() |> summarise(mean = mean(Duration))/52,1)} years, with a standard deviation of {round(MasterTable1 |> ungroup() |> summarise(sd = sd(Duration))/52,2)} years.
 
 ```
 
@@ -1998,7 +1983,8 @@ FailuresRep <-
 Complications and adverse events are summarised below. Individual reoperation data can be accessed in [Attachment 1](https://docs.google.com/spreadsheets/d/1ESVvSKAv8ma11kri9pby6OEU9Gk5Z3UnF6XwjXBTcTg/edit#gid=0).
 
 ```{r}
-#| label: IntraopComp - Rep
+#| label: tbl-intraopcomp
+#| tbl-cap: "Intraoperative complications detected for procedures receiving anchor of interest"
 
 
 # Check if any Count value is greater than zero in filtered data
@@ -2017,7 +2003,7 @@ if (has_complications == 0) {
   )
   
   IntraopComp |> filter(
-    TreatmentID %in% MasterTable2$TreatmentID
+    TreatmentID %in% MasterTable1$TreatmentID
   ) |> rename(
     Description = "ICNature2",
     Intervention = "ICIntervention",
@@ -2030,6 +2016,8 @@ if (has_complications == 0) {
     ) |> gt::gt()
 }
 ```
+
+Of the cases identified in @tbl-intraopcomp, all were deemed unrelated to the anchor of interest.
 
 ```{r}
 #| label:  Complication-Other-Rep
@@ -2120,7 +2108,7 @@ gtsummary::as_flex_table(TableRepPC) |> flextable::set_table_properties(
 
 
 MasterTableReop <- ComplicTable3 |> filter(
-  TreatmentID %in% MasterTable2$TreatmentID,
+  TreatmentID %in% MasterTable1$TreatmentID,
   `Reoperation Procedure` == "Yes"
   ) |> group_by(TreatmentID) |> slice_min(
     ReopDelay_Surgery,
@@ -2167,11 +2155,11 @@ Write reoperations to external sheet
 
 
 
-{ifelse(nrow(MasterTable2Reop) == 0,
+{ifelse(nrow(MasterTableReop) == 0,
         epoxy::epoxy("There are no reoperations to report."),
        with_gs4_quiet(googlesheets4::range_write(
          ss = SheetIDs$AuditReport,
-         data = MasterTable2Reop,
+         data = MasterTableReop,
          sheet = "Reoperations1",
          range = "A1:P",
          col_names = TRUE
@@ -2237,6 +2225,3 @@ gtsummary::as_flex_table(TableRepPROM) |> flextable::set_table_properties(
 
 
 ```
-
-
-
