@@ -1093,7 +1093,7 @@ SnapshotSubseq <- SnapshotComb2 |> dplyr::filter(
 ```
 
 ```{r}
-#| eval: false
+#| eval: true
 
 # Authenticate for sheets using the same token
 gs4_auth(token = drive_token())
