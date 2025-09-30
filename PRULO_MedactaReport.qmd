@@ -1101,8 +1101,8 @@ gs4_auth(token = drive_token())
 SnapshotRevision <- googlesheets4::range_read(
   ss = SheetIDs$AuditResults,
   sheet = "Failures",
-  range = "A1:I",
-  col_types = "ccDcccDcc"
+  range = "A1:H",
+  col_types = "ccDcccDc"
 )
 
 SnapshotComb2a <- left_join(
@@ -1139,55 +1139,89 @@ SnapshotCombCheck <- SnapshotComb2a |> dplyr::select(
 )
 ```
 
-## Prepare product groups of interest
+## Prepare patient group of interest
 
 Tables were rearranged and the dataset was filtered against an ignore list created from the product configuration table. Regular expressions were used to match products of interest to intraoperative hardware information and to sum the instances of implantation for each product of interest.
 
 ```{r}
-#| label: Product-usage
+#| label: strobe-input
+#| code-summary: "CONSORT|STROBE"
 
-#Extract cases with Mitek
 
-ProductUsage1 <- SnapshotComb2a |> dplyr::select(TreatmentID,ImplantCodes) |> dplyr::filter(stringr::str_detect(ImplantCodes,"05.10.002"))
+# Inclusion
+# - Surgical treatment
+# - With hardware of interest
+# After "induction"
+# - Patient withdraws consent
+# - Treatment fails before analysis date
+# - Not eligible for 3m followup
+# 
 
-# Trim whitespace
-ProductUsage1$ImplantCodes <- trimws(ProductUsage1$ImplantCodes)
-
-#Pivot long so each Product code is on its own row
-
-# Link back to ProductTable and bring back model description and count models rather than SKUs
-ProductUsage2 <- separate_longer_delim(
-    ProductUsage1,
-    cols = ImplantCodes,
-    ", ") |> dplyr::filter(
-      stringr::str_detect(ImplantCodes,"05.10.002")
-    )
-```
-
-```{r}
-ProductUsage3 <- ProductUsage2 |> summarise(
-  .by = TreatmentID,
-  UsageCount = n()
+STROBEFlow <- STROBEInput |> dplyr::filter(
+  !is.na(TreatmentID)
+) |> dplyr::left_join(
+  SnapshotComb1 |> dplyr::select(
+    TreatmentID,
+    CombID,
+    DateInitialExamination,
+    EligibleAtPreop,
+    EligibleAtx3months
+  ),
+  by = "TreatmentID"
+) |> dplyr::mutate(
+  DurationTotal = as.numeric(as.duration(interval(ymd(DateTreatment), ymd(SnapshotDate))),"days"),
+  exclusion1 = case_when(
+    is.na(SurgicalTreatment) ~ "Not a surgical treatment",
+    SurgicalTreatment == "Surgical" ~ NA_character_,
+    .default = "Not a surgical treatment"
+  ),
+  induction = if_else(
+    !is.na(exclusion1),
+    NA_character_,
+    TreatmentID
+  ),
+  exclusion2 = case_when(
+    !is.na(induction) & stringr::str_detect(RegistryStatus,"Opt-out") ~ "Patient Opt-Out",
+    !is.na(induction) & stringr::str_detect(ImplantCodes,"05.10.002") ~ NA_character_,
+    (!is.na(induction) & stringr::str_detect(ImplantCodes,"05.10.002", negate = TRUE)) | (!is.na(induction) & is.na(ImplantCodes)) ~ "No hardware of interest"
+  ),
+  followup = if_else(
+    !is.na(induction) & is.na(exclusion2),
+    TreatmentID,
+    NA_character_
+  ),
+  arm3 = if_else(
+    !is.na(followup),
+    RegistryCohortName,
+    NA_character_
+  ),
+  lost_followup = case_when(
+    !is.na(induction) & is.na(exclusion2) & is.na(EligibleAtx3months) & TreatmentStatus == "Failed" & (ymd(DateStatusChange) < ymd(SnapshotDate)) ~ "Repair failure",
+    !is.na(induction) & is.na(exclusion2) & is.na(EligibleAtx3months) & TreatmentStatus == "No further followup" & (ymd(DateStatusChange) < ymd(SnapshotDate)) ~ "Patient Opt-out",
+    !is.na(induction) & is.na(exclusion2) & TreatmentStatus == "Ongoing" & is.na(EligibleAtx3months) ~ "Not eligible for followup"
+  ),
+  mitt = if_else(
+    !is.na(followup) & is.na(lost_followup),
+    TreatmentID,
+    NA_character_
 )
+) |> dplyr::rename(
+  trialno = "TreatmentID"
+)
+
+
 ```
+
+
+Reduce to master table and adjust sex for report presentation
 
 ```{r}
 #| label: master-list
 
 
 MasterTable <- SnapshotComb2a |> filter(
-  TreatmentID %in% ProductUsage3$TreatmentID
-)
-
-
-```
-
-## Adjust patient demographics for presentation
-
-Recode Sex for report presentation.
-
-```{r}
-MasterTable1 <- MasterTable |> mutate(
+  TreatmentID %in% STROBEFlow$followup
+) |> mutate(
   Sex2 = case_when(
     Sex == "F" ~ "Female",
     Sex == "M" ~ "Male",
@@ -1196,7 +1230,12 @@ MasterTable1 <- MasterTable |> mutate(
 ) |> dplyr::select(-Sex) |> rename(
   Sex = "Sex2"
 )
+
+
 ```
+
+
+
 
 ## Prepare Patient-Reported Outcomes
 
@@ -1209,7 +1248,7 @@ The PRULO registry uses the QuickDASH [@gummesson2006] for all cases, Western On
 
 #Add delta columns Pre-3months; Pre-6months; Pre-12months
 
-MasterPROM <- MasterTable1 |>
+MasterPROM <- MasterTable |>
   rename_with( ~sub("_TotalScore_","",.), contains("TotalScore")) |>
   rename_with( ~sub("WOSI_Norm_","WOSINorm",.), contains("WOSI_Norm")) |>
   rename_with( ~sub("WORC_Norm_","WORCNorm",.), contains("WORC_Norm")) |>
@@ -1337,7 +1376,7 @@ Adverse events were monitored by near real-time chart review and surgical bookin
 # Slice out intraoperative complications (explants)
 # 
 # 
-IntraopComp <- MasterTable1 |> dplyr::select(
+IntraopComp <- MasterTable |> dplyr::select(
   TreatmentID,
   CombID,
   DateTreatment,
@@ -1388,12 +1427,7 @@ na_in_SnapshotComb2a <- sum(is.na(SnapshotComb2a$TreatmentID))
 
 ```
 
-```{epoxy}
-#| eval: false
 
-There are {nrow(MasterTable1 |> filter(is.na(TreatmentID)))} cases with missing TreatmentID in the dataset and {nrow(ComplicTable1 |> filter(is.na(TreatmentID)))} missing in the complications table.
-
-```
 
 <!--# Clean up live tables for complications. Assess date validity and correct data entry. -->
 
@@ -1603,74 +1637,7 @@ with_gs4_quiet(googlesheets4::range_write(
 
 The diagram below summarises recruitment and categorisation of patients into the PRULO registry.
 
-```{r}
-#| label: strobe-input
-#| code-summary: "CONSORT|STROBE"
 
-
-# Inclusion
-# - Surgical treatment
-# - With hardware of interest
-# After "induction"
-# - Patient withdraws consent
-# - Treatment fails before analysis date
-# - Not eligible for 3m followup
-# 
-
-STROBEFlow <- STROBEInput |> dplyr::filter(
-  !is.na(TreatmentID)
-) |> dplyr::left_join(
-  SnapshotComb1 |> dplyr::select(
-    TreatmentID,
-    CombID,
-    DateInitialExamination,
-    EligibleAtPreop,
-    EligibleAtx3months
-  ),
-  by = "TreatmentID"
-) |> dplyr::mutate(
-  DurationTotal = as.numeric(as.duration(interval(ymd(DateTreatment), ymd(SnapshotDate))),"days"),
-  exclusion1 = case_when(
-    is.na(SurgicalTreatment) ~ "Not a surgical treatment",
-    SurgicalTreatment == "Surgical" ~ NA_character_,
-    .default = "Not a surgical treatment"
-  ),
-  induction = if_else(
-    !is.na(exclusion1),
-    NA_character_,
-    TreatmentID
-  ),
-  exclusion2 = case_when(
-    !is.na(induction) & stringr::str_detect(RegistryStatus,"Opt-out") ~ "Patient Opt-Out",
-    !is.na(induction) & stringr::str_detect(ImplantCodes,"05.10.002") ~ NA_character_,
-    (!is.na(induction) & stringr::str_detect(ImplantCodes,"05.10.002", negate = TRUE)) | (!is.na(induction) & is.na(ImplantCodes)) ~ "No hardware of interest"
-  ),
-  followup = if_else(
-    !is.na(induction) & is.na(exclusion2),
-    TreatmentID,
-    NA_character_
-  ),
-  arm3 = if_else(
-    !is.na(followup),
-    RegistryCohortName,
-    NA_character_
-  ),
-  lost_followup = case_when(
-    !is.na(induction) & is.na(exclusion2) & TreatmentStatus == "Failed" & (ymd(DateStatusChange) < ymd(SnapshotDate)) ~ "Repair failure",
-    !is.na(induction) & is.na(exclusion2) & TreatmentStatus == "No further followup" & (ymd(DateStatusChange) < ymd(SnapshotDate)) ~ "Patient Opt-out",
-    !is.na(induction) & is.na(exclusion2) & TreatmentStatus == "Ongoing" & is.na(EligibleAtx3months) ~ "Not eligible for followup"
-  ),
-  mitt = if_else(
-    !is.na(followup) & is.na(lost_followup),
-    TreatmentID,
-    NA_character_
-)
-) |> dplyr::rename(
-  trialno = "TreatmentID"
-)
-
-
-```
 
 ```{r}
 #| label: fig-strobe
@@ -1686,7 +1653,7 @@ STROBEPlot <- consort::consort_plot(
     exclusion1 = "Excluded",
     induction = "Received Surgery",
     exclusion2 = "Excluded from Sample",
-    followup = "Study Sample at Baseline",
+    followup = "Received JLock anchor",
     arm3 = "Diagnostic Group",
     lost_followup = "Unavailable 3m",
     mitt = "Final Analysis"),
@@ -1712,9 +1679,7 @@ knitr::knit_print(STROBEPlot)
 #| label: tbl-diagnosis
 #| tbl-cap: "Summary of diagnoses using ICD-10 coding for primary presentation"
 
-DiagnosisData <- MasterTable1 |> dplyr::filter(
-  TreatmentID %in% STROBEFlow$followup
-) |> mutate(
+DiagnosisData <- MasterTable1  |> mutate(
     ICD10 = stringr::str_extract(DiagnosisPrimary,"^[A-Za-z]+[0-9.]+")
   )
 
@@ -1730,89 +1695,6 @@ knitr::kable(TableData)
 
 ```
 
-The table below summarises patient diagnoses in the PRULO registry. The primary pathology for a given presentation was derived from clinical notes and labelled with an ICD-10 (international) code. Each code was included in a configuration file to link to a registry cohort.
-
-```{r}
-#| label: tbl-surgical
-#| tbl-cap: "Summary of PRULO surgical cases by cohort"
-
-TableRepB <-
-  MasterTable1 |> mutate(
-    SurgeonA = case_when(
-    Surgeon == "KE" ~ "A",
-    Surgeon == "RP" ~ "B",
-    Surgeon == "GB" ~ "C",
-    .default = NA_character_
-  )) |>
-  filter(SurgicalTreatment == "Surgical" &
-          !grepl("Pending",TreatmentStatus)) |>
-  dplyr::select(
-    AgeAtInitialExam, 
-    Sex,
-    Cohort,
-    IndexSide,
-    BilateralStatus,
-    SymptomDuration,
-    SymptomDurationCat,
-    #SurgeonA,
-    TreatmentStatus,
-    RegistryStatus
-    ) |>
-    tbl_summary(
-      by = "Cohort",
-      label = list(
-        #SurgeonA ~ "Surgeon",
-        AgeAtInitialExam ~ "Age at Initial Consultation (Years)",
-        Sex = "Male",
-        BilateralStatus ~ "Bilateral Presentation",
-        IndexSide ~ "Dominant Side",
-        TreatmentStatus ~ "Treatment Record Active",
-        RegistryStatus ~ "Patient Record Active",
-        SymptomDuration ~ "Symptom Duration (Weeks)",
-        SymptomDurationCat ~ "Symptom Duration Category"
-      ),
-      type = list(
-        Sex ~ "dichotomous",
-        TreatmentStatus ~ "dichotomous"
-      ),
-      value = list(
-        Sex = "Male",
-        IndexSide = "Dominant",
-        TreatmentStatus = "Ongoing",
-        RegistryStatus = "Open"
-      ),
-      statistic = list(
-        all_categorical() ~ "{p} ({n})"
-        ),
-      missing = "no"
-    ) |> add_stat_label(
-    location = "column"
-  ) |> add_overall() |> modify_table_styling(
-      columns = label,
-      rows = label == "Symptom Duration Category",
-      footnote = "Dichotomised below or equal to 0.5 years or greater than 0.5 years"
-  ) |> modify_table_styling(
-      columns = label,
-      rows = label == "Treatment Record Active",
-      footnote = "Treatment record remains active - no change to follow up"
-  ) |> modify_table_styling(
-      columns = label,
-      rows = label == "Patient Record Active",
-      footnote = "Patient record remains open - no change to consent or mortality status"
-  ) 
-
-gtsummary::as_flex_table(TableRepB) |> flextable::set_table_properties(
-  layout = "autofit",
-  width = 0.15,
-  align = "center",
-  opts_word = list(
-    split = TRUE
-    )
-  )
-
-```
-
-<!--# Removed SymptomDurationCat - turning it into a factor was problematic when constructing the summary table with gtsummary-->
 
 The overall registry enrolment is summarised in @tbl-surgical, describing how the population is summarised into cohorts.
 
@@ -1852,7 +1734,7 @@ Usage of the Product within the patient group is summarised below.
 #| label: Slice-stack-2
 
 
-MasterTable2 <- MasterTable1 |> mutate(
+MasterTable1 <- MasterTable |> mutate(
     CuffStatus2 = case_when(
       is.na(CuffStatus) & !is.na(PatientPosition) ~ "Intact",
       !is.na(CuffStatus) ~ CuffStatus,
@@ -1895,7 +1777,7 @@ Patient demographic, pathology, and treatment characteristics for this cohort re
 #| tbl-cap: "Summary of PRULO Report JLock (All) - Patient Characteristics"
 
 TableRep <-
-  MasterTable2 |> mutate(
+  MasterTable1 |> mutate(
     SurgeonA = case_when(
       Surgeon == "KE" ~ "A",
       Surgeon == "RP" ~ "B",
@@ -1913,7 +1795,8 @@ TableRep <-
     #SurgeonA,
     #LongHeadBiceps,
     TreatmentStatus,
-    RegistryStatus
+    RegistryStatus,
+    Cohort
     ) |>
     tbl_summary(
       #by = LongHeadBiceps,
@@ -1944,8 +1827,9 @@ TableRep <-
       statistic = list(
         all_categorical() ~ "{p} ({n})"
         ),
+      by = "Cohort",
       missing = "no"
-    ) |> add_stat_label(
+    ) |> add_overall() |> add_stat_label(
     location = "column"
   ) |> modify_table_styling(
       columns = label,
@@ -1978,11 +1862,11 @@ Surgical findings and management strategies are summarised below.
 
 ```{r}
 #| label: tbl-pathsurg
-#| tbl-cap: "Summary of PRULO Report 6 (All) Cases Pathology and Surgical Details"
+#| tbl-cap: "Summary of PRULO Report (JLock) Cases Pathology and Surgical Details"
 
 
 TableRep2 <-
-  MasterTable2 |>
+  MasterTable1 |>
   dplyr::select(
     CuffStatus2,
     TreatmentType,
@@ -2020,7 +1904,7 @@ gtsummary::as_flex_table(TableRep2) |> flextable::set_table_properties(
 #| label:  Duration
 
 
-The mean follow up duration is {round(MasterTable2 |> ungroup() |> summarise(mean = mean(Duration))/52,1)} years, with a standard deviation of {round(MasterTable2 |> ungroup() |> summarise(sd = sd(Duration))/52,2)} years.
+The mean follow up duration is {round(MasterTable1 |> ungroup() |> summarise(mean = mean(Duration))/52,1)} years, with a standard deviation of {round(MasterTable2 |> ungroup() |> summarise(sd = sd(Duration))/52,2)} years.
 
 ```
 
@@ -2028,11 +1912,11 @@ Failure or revision events as identified in the registry for this cohort are sum
 
 ```{r}
 #| label: tbl-procsurvival
-#| tbl-cap: "Summary of PRULO Report (All) Cases - Procedure Survival"
+#| tbl-cap: "Summary of PRULO Report (JLock) Cases - Procedure Survival"
 
 TableRep3 <- tbl_survfit(
   survfit2(Surv(Duration, Status) ~ 1, 
-           data = MasterTable2),
+           data = MasterTable1),
   times = c(1,26,52,104),
   label_header = "**{time} Weeks**",
   label = "Procedure Survival",
@@ -2060,7 +1944,7 @@ gtsummary::as_flex_table(TableRep3) |> flextable::set_table_properties(
 #Anchor 1 Anchor 2 Anchor 3 Anchor 4
 
 FailuresRep <-
-  MasterTable2 |> mutate(
+  MasterTable1 |> mutate(
     TreatmentStatusDesc = stringr::str_to_sentence(TreatmentStatusNotes)
   ) |>
       filter(TreatmentStatus == "Failed") |> 
@@ -2085,6 +1969,7 @@ FailuresRep <-
 
 ```{epoxy}
 #| label: Failure-Report-2
+#| eval: false
 
 {ifelse(nrow(FailuresRep) == 0,
         epoxy::epoxy("There are no failures or revisions to report."),
@@ -2111,7 +1996,7 @@ Complications and adverse events are summarised below. Individual reoperation da
 
 
 # Check if any Count value is greater than zero in filtered data
-has_complications <- MasterTable2 |> 
+has_complications <- MasterTable1 |> 
   filter(TreatmentID %in% IntraopComp$TreatmentID) |> 
   nrow() > 0
 
@@ -2144,7 +2029,7 @@ if (has_complications == 0) {
 #| label:  Complication-Other-Rep
 
 
-MasterTable2Other <- MasterTable2 |> filter(
+MasterTableOther <- MasterTable1 |> filter(
   Other == TRUE
 ) |> dplyr::select(
   TreatmentID,
@@ -2155,10 +2040,10 @@ MasterTable2Other <- MasterTable2 |> filter(
 
 ```{r}
 #| label: tbl-TableRep4
-#| tbl-cap: "Summary of PRULO Report Cases - Postoperative Events"
+#| tbl-cap: "Summary of PRULO Report (JLock) Cases - Postoperative Events"
 
 # Now create the summary table
-TableRep64 <- MasterTable2 |>
+TableRepPC <- MasterTable1 |>
   dplyr::select(
     Infection,
     Ligament_Tendon,
@@ -2206,7 +2091,7 @@ TableRep64 <- MasterTable2 |>
       footnote = "Time between index procedure and reoperation"
     ) 
 
-gtsummary::as_flex_table(TableRep64) |> flextable::set_table_properties(
+gtsummary::as_flex_table(TableRepPC) |> flextable::set_table_properties(
   layout = "autofit",
   width = 0.5,
   align = "center",
@@ -2228,14 +2113,14 @@ gtsummary::as_flex_table(TableRep64) |> flextable::set_table_properties(
 ##Flip this around so that multiple reoperations are retained
 
 
-MasterTable2Reop <- ComplicTable3 |> filter(
+MasterTableReop <- ComplicTable3 |> filter(
   TreatmentID %in% MasterTable2$TreatmentID,
   `Reoperation Procedure` == "Yes"
   ) |> group_by(TreatmentID) |> slice_min(
     ReopDelay_Surgery,
     n = 1
     ) |> ungroup() |> left_join(
-      MasterTable2 |> dplyr::select(
+      MasterTable1 |> dplyr::select(
     TreatmentID,
     AgeAtInitialExam,
     Sex,
@@ -2272,6 +2157,7 @@ Write reoperations to external sheet
 
 ```{epoxy}
 #| label: Reoperations-Report-2
+#| eval: false
 
 
 
@@ -2313,10 +2199,10 @@ RepPROM1 / RepPROM2
 
 ```{r}
 #| label: tbl-TableRep65
-#| tbl-cap: "Summary of PRULO Report 6 (All) Cases - QuickDASH"
+#| tbl-cap: "Summary of PRULO Report (JLock) Cases - QuickDASH"
 
 
-TableRep65 <- MasterPROM1 |>
+TableRepPROM <- MasterPROM1 |>
 dplyr::select(
   QDASH,
   QDASHDelta,
@@ -2334,9 +2220,9 @@ tbl_summary(by = "Timepoint",
             statistic = all_continuous() ~ "{median} ({p25} - {p75})"
             )
 
-gtsummary::as_flex_table(TableRep65) |> flextable::set_table_properties(
+gtsummary::as_flex_table(TableRepPROM) |> flextable::set_table_properties(
   layout = "autofit",
-  width = 0.5,
+  width = 0.7,
   align = "center",
   opts_word = list(
     split = TRUE
@@ -2347,50 +2233,4 @@ gtsummary::as_flex_table(TableRep65) |> flextable::set_table_properties(
 ```
 
 
-
-
-
-```{r}
-#| label: Read-live-tables-2
-#| eval: false
-
-
-# Authenticate for sheets using the same token
-gs4_auth(token = drive_token())
-
-
-PROMsMaster <- googlesheets4::sheet_write(
-  data = MasterTable2 |> dplyr::filter(
-    Labrum == "None"
-  ) |> left_join(
-    PatientTable |> dplyr::select(
-      PatientID,
-      FirstName,
-      LastName
-    ),
-    by = "PatientID"
-  ) |> dplyr::select(
-    TreatmentID,
-    DateTreatment,
-    AffectedSide,
-    FirstName,
-    LastName,
-    DateOfBirth
-  ) ,
-  ss = SheetIDs$AuditResults,
-  sheet = "MedactaDiscrepancy"
-)
-
-```
-
-```{r}
-
-MedactaDiscrep <- MasterTable2 |> dplyr::filter(
-    Labrum == "None"
-  ) |> dplyr::select(
-    TreatmentID,
-    Labrum
-  )
-
-```
 
