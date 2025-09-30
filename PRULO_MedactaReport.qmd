@@ -1687,11 +1687,7 @@ knitr::kable(TableData)
 
 ```
 
-The overall registry enrolment is summarised in @tbl-surgical, describing how the population is summarised into cohorts.
-
 # Product Report - JLock
-
-## Overview
 
 Usage of the Product within the patient group is summarised below.
 
@@ -1718,8 +1714,6 @@ Usage of the Product within the patient group is summarised below.
 }
 
 ```
-
-## Procedure Report - All
 
 ```{r}
 #| label: Slice-stack-2
@@ -1759,7 +1753,7 @@ MasterTable1 <- MasterTable |> mutate(
 )
 ```
 
-### Patient Characteristics
+## Patient Characteristics
 
 Patient demographic, pathology, and treatment characteristics for this cohort receiving the Product are summarised below.
 
@@ -1847,7 +1841,7 @@ gtsummary::as_flex_table(TableRep) |> flextable::set_table_properties(
 
 ```
 
-### Surgical Details
+## Surgical Details
 
 Surgical findings and management strategies are summarised below.
 
@@ -1889,7 +1883,7 @@ gtsummary::as_flex_table(TableRep2) |> flextable::set_table_properties(
 )
 ```
 
-### Treatment Survival
+## Treatment Survival
 
 ```{epoxy}
 #| label:  Duration
@@ -1978,7 +1972,7 @@ FailuresRep <-
 
 ```
 
-### Adverse Events
+## Adverse Events
 
 Complications and adverse events are summarised below. Individual reoperation data can be accessed in [Attachment 1](https://docs.google.com/spreadsheets/d/1ESVvSKAv8ma11kri9pby6OEU9Gk5Z3UnF6XwjXBTcTg/edit#gid=0).
 
@@ -2146,8 +2140,6 @@ MasterTableReop <- ComplicTable3 |> filter(
     )
 
 ```
-
-Write reoperations to external sheet
 
 ```{epoxy}
 #| label: Reoperations-Report-2
