@@ -1861,7 +1861,14 @@ TableRep2 <-
       #by = LongHeadBiceps,
       label = list(
         CuffStatus2 ~ "Cuff Status",
-        TreatmentType ~ "Treatment Type"
+        TreatmentType ~ "Treatment Type",
+        CuffRepair ~ "Cuff Procedure"
+      ),
+      type = list(
+        CuffRepair ~ "dichotomous"
+      ),
+      value = list(
+        CuffRepair ~ "Remplissage"
       ),
       statistic = list(
         all_categorical() ~ "{p} ({n})"
