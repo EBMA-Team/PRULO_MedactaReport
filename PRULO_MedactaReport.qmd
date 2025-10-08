@@ -164,44 +164,44 @@ Include a series of functions to call later in the file for processing data impo
 base_folder_id1 <- "1og1hWKEXFcy8v8pLSzA_Ii767bbCe_EK"
 
 
+
+
 ```
 
 ```{r}
-#| label: Retrieve-snapshot
+#| label: Retrieve-snapshot-func
 
 
-get_latest_snapshot <- function(base_folder_id = base_folder_id1) {
+get_specific_snapshot <- function(folder_name, base_folder_id = base_folder_id1) {
   tryCatch({
-    # List all folders in the base directory
-    folders <- googledrive::drive_ls(as_id(base_folder_id), pattern = "^\\d{8}$")
+    # Check if the folder exists in the base directory
+    folder <- googledrive::drive_ls(as_id(base_folder_id), pattern = paste0("^", folder_name, "$"))
     
-    if(nrow(folders) == 0) {
-      stop("No dated folders found")
+    if(nrow(folder) == 0) {
+      stop(paste("Folder", folder_name, "not found"))
     }
     
-    # Sort folders by name (date) in descending order
-    latest_folder <- folders[order(folders$name, decreasing = TRUE),][1,]
-    
-    # Find the snapshot file in the latest folder
+    # Find the snapshot file in the specified folder
     snapshot_file <- googledrive::drive_ls(
-      latest_folder$id, 
+      folder$id, 
       pattern = "Registry data snapshot\\.xlsx$"
     )
     
     if(nrow(snapshot_file) == 0) {
-      stop("No snapshot file found in latest folder")
+      stop("No snapshot file found in specified folder")
     }
     
     # Return both pieces of information as a list
     return(list(
       snapshot = snapshot_file,
-      folder_name = latest_folder$name
+      folder_name = folder$name
     ))
     
   }, error = function(e) {
-    stop(paste("Error finding latest snapshot:", e$message))
+    stop(paste("Error finding specified snapshot:", e$message))
   })
 }
+
 ```
 
 ```{r}
@@ -397,19 +397,29 @@ TargetTerms2 <- googlesheets4::range_read(
 ```{r}
 #| label: Import-snapshot
 
-# Get the latest snapshot file
-latest_snapshot <- get_latest_snapshot()
-# 
-# You can then use these in your subsequent code:
-temp_file <- tempfile(fileext = ".xlsx")
+# Authenticate for sheets using the same token
+gs4_auth(token = drive_token())
+
+# To get a snapshot from a specific folder (e.g., "20230415")
+specific_snapshot <- get_specific_snapshot("20250331")
+
+
+```
+
+
+```{r}
+temp_file1 <- tempfile(fileext = ".xlsx")
 drive_download(
-  file = latest_snapshot$snapshot$id,
-  path = temp_file,
+  file = specific_snapshot$snapshot$id,
+  path = temp_file1,
   overwrite = TRUE
 )
 
+# Correction to reset back to excel origin
+DaysDiff <- as.numeric(as.duration(interval(ymd("1899-12-30"), ymd("1970-01-01"))),"days")
+
 SnapshotGen <- openxlsx2::read_xlsx(
-  temp_file,
+  temp_file1,
   sheet = "ShoulderGeneral",
   colNames = TRUE,
   detectDates = TRUE
@@ -419,7 +429,7 @@ SnapshotGen <- openxlsx2::read_xlsx(
   )
 
 SnapshotRC <- openxlsx2::read_xlsx(
-  temp_file,
+  temp_file1,
   sheet = "RotatorCuff",
   colNames = TRUE,
   detectDates = TRUE
@@ -429,7 +439,7 @@ SnapshotRC <- openxlsx2::read_xlsx(
   )
 
 SnapshotGHI <- openxlsx2::read_xlsx(
-  temp_file,
+  temp_file1,
   sheet = "GlenohumeralInstability",
   colNames = TRUE,
   detectDates = TRUE
@@ -438,21 +448,19 @@ SnapshotGHI <- openxlsx2::read_xlsx(
     across(starts_with("IC"),as.character)
   )
 
+
 STROBEInput <- openxlsx2::read_xlsx(
-  temp_file,
+  temp_file1,
   sheet = "Strobe_Input",
   colNames = TRUE,
   detectDates = TRUE
-  ) |> dplyr::mutate(
-    Cohort = "Glenohumeral Instability"
   )
-
 ```
 
 ```{r}
 #| label: Coerce-date
 
-SnapshotDate <- lubridate::ymd(latest_snapshot$folder_name)
+SnapshotDate <- lubridate::ymd("20250831")
 
 ```
 
