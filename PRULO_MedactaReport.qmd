@@ -1862,7 +1862,7 @@ TableRep2 <-
       label = list(
         CuffStatus2 ~ "Cuff Status",
         TreatmentType ~ "Treatment Type",
-        CuffRepair ~ "Cuff Procedure"
+        CuffRepair ~ "Cuff Remplissage"
       ),
       type = list(
         CuffRepair ~ "dichotomous"
