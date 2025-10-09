@@ -4,8 +4,8 @@ author: "Corey Scholes"
 type: "website"
 number-sections: true
 number-depth: 3
-date: "2025-Apr-11"
-date-modified: "2025-Jul-23"
+date: "2025-Se-08"
+date-modified: "2025-Oct-09"
 bibliography: MedactaReport references.bib
 format: 
   html:
