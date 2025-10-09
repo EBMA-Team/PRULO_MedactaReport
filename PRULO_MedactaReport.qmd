@@ -408,7 +408,12 @@ specific_snapshot <- get_specific_snapshot("20250930")
 
 
 ```
+```{r}
+#| label: Coerce-date
 
+SnapshotDate <- lubridate::ymd("20250930")
+
+```
 
 ```{r}
 temp_file1 <- tempfile(fileext = ".xlsx")
@@ -461,12 +466,7 @@ STROBEInput <- openxlsx2::read_xlsx(
 
 
 
-```{r}
-#| label: Coerce-date
 
-SnapshotDate <- lubridate::ymd("20250930")
-
-```
 
 ```{epoxy}
 #| label: Declare-date
