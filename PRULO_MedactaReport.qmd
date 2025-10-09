@@ -43,6 +43,9 @@ execute:
 
 **Version:** 1.0
 
+
+
+
 # Introduction
 
 The surgeons from Geelong Orthopaedics participating in the Patient Registry of Upper Limb Pathology Outcomes (PRULO) specialise in joint replacement, sports injuries, upper limb and hand surgery, and trauma. The PRULO registry collates and stores patient outcomes collected routinely as part of the standard clinical pathway for upper limb pathology treatment.
@@ -401,7 +404,7 @@ TargetTerms2 <- googlesheets4::range_read(
 gs4_auth(token = drive_token())
 
 # To get a snapshot from a specific folder (e.g., "20230415")
-specific_snapshot <- get_specific_snapshot("20250331")
+specific_snapshot <- get_specific_snapshot("20250930")
 
 
 ```
@@ -418,81 +421,20 @@ drive_download(
 # Correction to reset back to excel origin
 DaysDiff <- as.numeric(as.duration(interval(ymd("1899-12-30"), ymd("1970-01-01"))),"days")
 
-SnapshotGen <- openxlsx2::read_xlsx(
+Snapshot <- openxlsx2::read_xlsx(
   temp_file1,
-  sheet = "ShoulderGeneral",
+  sheet = "Combined",
   colNames = TRUE,
   detectDates = TRUE
   ) |> dplyr::mutate(
-    Cohort = "General",
     across(starts_with("IC"),as.character)
-  )
-
-SnapshotRC <- openxlsx2::read_xlsx(
-  temp_file1,
-  sheet = "RotatorCuff",
-  colNames = TRUE,
-  detectDates = TRUE
-  ) |> dplyr::mutate(
-    Cohort = "Rotator Cuff",
-    across(starts_with("IC"),as.character)
-  )
-
-SnapshotGHI <- openxlsx2::read_xlsx(
-  temp_file1,
-  sheet = "GlenohumeralInstability",
-  colNames = TRUE,
-  detectDates = TRUE
-  ) |> dplyr::mutate(
-    Cohort = "Glenohumeral Instability",
-    across(starts_with("IC"),as.character)
-  )
-
-
-STROBEInput <- openxlsx2::read_xlsx(
-  temp_file1,
-  sheet = "Strobe_Input",
-  colNames = TRUE,
-  detectDates = TRUE
-  )
-```
-
-```{r}
-#| label: Coerce-date
-
-SnapshotDate <- lubridate::ymd("20250831")
-
-```
-
-```{epoxy}
-#| label: Declare-date
-
-The snapshot date was {# Format to desired format using format()
-FormattedDate <- format(SnapshotDate, "%d-%b-%Y")} and the report prepared {format(today(), "%d-%b-%Y")}. The imported data contains a dataframe of {nrow(SnapshotRC)} cases returned from the Rotator Cuff cohort, a dataframe of {nrow(SnapshotGHI)} cases returned from the Glenohumeral Instability cohort and a dataframe of {nrow(SnapshotGen)} cases from the General cohort. An additional dataframe was retrieved of {nrow(STROBEInput)} cases to generate the STROBE flow chart from the PRULO registry. 
-
-```
-
-## Combine and Filter for 3 month follow up
-
-The dataset was filtered to only include records with a minimum of 3 months follow up at the time of analysis.
-
-```{r}
-## Slice inputs for columns and rows
-#| label: Slice-stack-1
-#| code-summary: "line up input frames"
-#| warning: false
-
-# Combine SnapshotRC, SnapshotGH, and SnapshotGen into a single table.
-# Remove 'ExternalStudyTag', 'Email', and 'Phone' columns.
-SnapshotComb <- SnapshotRC |> dplyr::select(-(c(ExternalStudyTag,Email,Phone))) |> 
-  # Combine 'SnapshotGH' and 'SnapshotGen' tables with 'SnapshotRC' table by removing the specified columns.
-  bind_rows(dplyr::select(SnapshotGHI, -(c(ExternalStudyTag,Email,Phone)))) |> 
-  # Continue to combine tables by removing the specified columns. This time, combining 'SnapshotGen'.
-  bind_rows(dplyr::select(SnapshotGen, -(c(ExternalStudyTag,Email,Phone)))) |> 
-  # Create a new column 'PatientID' based on the TreatmentID column, using 'str_split_i' function with a pattern of '.'. This means splitting the string at the first occurrence of '.', and capturing the first part (using `1` argument).
-  mutate(
-        PatientID = str_split_i(TreatmentID,"\\.",1)
-      ) |> 
+  ) |>
+  group_by(TreatmentID) |>
+  summarise(across(everything(), ~first(na.omit(.)))) |>
+  ungroup() |> mutate(
+  PatientID = str_split_i(TreatmentID,"\\.",1),
+  DurationTotal = as.numeric(as.duration(interval(ymd(DateTreatment), SnapshotDate)),"days")
+  ) |> 
   # Move 'PatientID' column before 'TreatmentID' column.
   relocate(
     PatientID, .before = TreatmentID
@@ -504,18 +446,123 @@ SnapshotComb <- SnapshotRC |> dplyr::select(-(c(ExternalStudyTag,Email,Phone))) 
   # Move 'CombID' column after 'TreatmentID' column.
   relocate(
     CombID, .after = TreatmentID
-  ) |> 
-  # Move 'Cohort' column to the desired position in the table.
-  relocate(
-    Cohort, .before = EligibleAtPreop
-  ) |> mutate(
-  DurationTotal = as.numeric(as.duration(interval(ymd(DateTreatment), SnapshotDate)),"days")
-  ) 
+  )
 
-# Pause this filter - filter the index procedures with this, not the revisions
-# |> filter(
-#     DurationTotal > 89
-#   )
+
+STROBEInput <- openxlsx2::read_xlsx(
+  temp_file1,
+  sheet = "Strobe_Input",
+  colNames = TRUE,
+  detectDates = TRUE
+  )
+```
+
+
+
+
+
+```{r}
+#| label: Coerce-date
+
+SnapshotDate <- lubridate::ymd("20250930")
+
+```
+
+```{epoxy}
+#| label: Declare-date
+
+The snapshot date was {# Format to desired format using format()
+FormattedDate <- format(SnapshotDate, "%d-%b-%Y")} and the report prepared {format(today(), "%d-%b-%Y")}. The imported data contains a dataframe of {nrow(SnapshotRC)} cases returned from the Rotator Cuff cohort, a dataframe of {nrow(SnapshotGHI)} cases returned from the Glenohumeral Instability cohort and a dataframe of {nrow(SnapshotGen)} cases from the General cohort. An additional dataframe was retrieved of {nrow(STROBEInput)} cases to generate the STROBE flow chart from the PRULO registry. 
+
+```
+
+
+## Prepare patient group of interest
+
+Tables were rearranged and the dataset was filtered for cases receiving the hardware of interest.
+
+```{r}
+#| label: strobe-input
+#| code-summary: "CONSORT|STROBE"
+
+
+# Inclusion
+# - Surgical treatment
+# - With hardware of interest
+# After "induction"
+# - Patient withdraws consent
+# - Treatment fails before analysis date
+# - Not eligible for 3m followup
+# 
+
+STROBEFlow <- STROBEInput |> dplyr::filter(
+  !is.na(TreatmentID)
+) |> dplyr::left_join(
+  SnapshotComb1 |> dplyr::select(
+    TreatmentID,
+    CombID,
+    DateInitialExamination,
+    EligibleAtPreop,
+    EligibleAtx3months
+  ),
+  by = "TreatmentID"
+) |> dplyr::mutate(
+  DurationTotal = as.numeric(as.duration(interval(ymd(DateTreatment), ymd(SnapshotDate))),"days"),
+  exclusion1 = case_when(
+    is.na(SurgicalTreatment) ~ "Not a surgical treatment",
+    SurgicalTreatment == "Surgical" ~ NA_character_,
+    .default = "Not a surgical treatment"
+  ),
+  induction = if_else(
+    !is.na(exclusion1),
+    NA_character_,
+    TreatmentID
+  ),
+  exclusion2 = case_when(
+    !is.na(induction) & stringr::str_detect(RegistryStatus,"Opt-out") ~ "Patient Opt-Out",
+    !is.na(induction) & stringr::str_detect(ImplantCodes,"05.10.002") ~ NA_character_,
+    (!is.na(induction) & stringr::str_detect(ImplantCodes,"05.10.002", negate = TRUE)) | (!is.na(induction) & is.na(ImplantCodes)) ~ "No hardware of interest"
+  ),
+  followup = if_else(
+    !is.na(induction) & is.na(exclusion2),
+    TreatmentID,
+    NA_character_
+  ),
+  arm3 = if_else(
+    !is.na(followup),
+    RegistryCohortName,
+    NA_character_
+  ),
+  lost_followup = case_when(
+    !is.na(induction) & is.na(exclusion2) & is.na(EligibleAtx3months) & TreatmentStatus == "Failed" & (ymd(DateStatusChange) < ymd(SnapshotDate)) ~ "Repair failure",
+    !is.na(induction) & is.na(exclusion2) & is.na(EligibleAtx3months) & TreatmentStatus == "No further followup" & (ymd(DateStatusChange) < ymd(SnapshotDate)) ~ "Patient Opt-out",
+    !is.na(induction) & is.na(exclusion2) & TreatmentStatus == "Ongoing" & is.na(EligibleAtx3months) ~ "Not eligible for followup"
+  ),
+  mitt = if_else(
+    !is.na(followup) & is.na(lost_followup),
+    TreatmentID,
+    NA_character_
+)
+) |> dplyr::rename(
+  trialno = "TreatmentID"
+)
+
+
+```
+
+## Create master table
+
+The dataset was filtered to only include records with a minimum of 3 months follow up at the time of analysis.
+
+```{r}
+## Slice inputs for columns and rows
+#| label: Slice-stack-1
+#| code-summary: "filter based on strobe flow"
+#| warning: false
+
+MasterTable <- Snapshot |> dplyr::filter(
+  TreatmentID %in% STROBEFlow$followup
+)
 
 ```
 
@@ -524,9 +571,9 @@ SnapshotComb <- SnapshotRC |> dplyr::select(-(c(ExternalStudyTag,Email,Phone))) 
 Procedure data was combined from all cohorts. New columns were created based on conditional statements, cases were filtered where procedure data was unavailable (non-surgical, missing intraoperative data). Procedure data was further processed to standardise labels, categorised by structure (Rotator Cuff, Labrum, Capsule and Ligament) and adjunct procedures reorganised to account for variation across surgical indication.
 
 ```{r}
-#| label: snapshot-comb1
+#| label: mastertable1
 
-SnapshotComb1  <- SnapshotComb |> 
+MasterTable1  <- MasterTable |> 
   # Use 'case_when' function to create CuffRepair2 column
   mutate(
     CuffRepair2 = case_when(
@@ -566,17 +613,11 @@ SnapshotComb1  <- SnapshotComb |>
     .after = last_col()
   ) |> dplyr::select(
     -CuffRepair
-  )
-```
-
-```{r}
-#
-SnapshotCombProc <- SnapshotComb1  |> 
-  # Use the 'filter' function from dplyr to apply a filter condition to the dataframe
-  filter( 
+  ) |> dplyr::filter( 
     str_length(Procedures2)  > 0
   )
 ```
+
 
 ```{r}
 
@@ -587,7 +628,7 @@ SnapshotCombProc <- SnapshotComb1  |>
 
 ProcedureMaster   <- tidytext::unnest_regex( 
   # Select specific columns from SnapshotCombProc dataframe
-  SnapshotCombProc  |> dplyr::select(
+  MasterTable1  |> dplyr::select(
     TreatmentID, 
     CombID, 
     DateTreatment, 
@@ -757,7 +798,7 @@ knitr::knit_print(FigProcCount)
 
 ProcedureMaster2 <- left_join(
   # Filter SnapshotComb1 to only include rows with SurgicalTreatment == "Surgical"
-  SnapshotComb1 |> filter(SurgicalTreatment == "Surgical") |>
+ MasterTable1 |> filter(SurgicalTreatment == "Surgical") |>
   
   # Select specific columns from the filtered data frame
   dplyr::select(TreatmentID, CuffRepair2, AdjunctProcedures2, SoftTissueProcedure, RepairAugmentation, ProceduresOfInterest),
@@ -958,8 +999,8 @@ by = "TreatmentID"
 # Marry into SnapshotComb to continue processing from one dataframe
 #Adjust for labrum procedures
 
-SnapshotComb1a <- left_join(
-  SnapshotComb1 |> dplyr::select(
+MasterTable2 <- left_join(
+  MasterTable1 |> dplyr::select(
     -(c(
       AdjunctProcedures,
       RepairAugmentation,
@@ -1019,7 +1060,7 @@ Additional numeric variables were calculated from inputs collected within the re
 # create endate and survival time
 
 #Calculate status
-SnapshotComb2 <- SnapshotComb1a |> mutate(
+MasterTable3 <- MasterTable2 |> mutate(
   Status = case_when(
     TreatmentStatus == "Failed"~ 1,
     .default = 0),
@@ -1040,7 +1081,7 @@ SnapshotComb2 <- SnapshotComb1a |> mutate(
  )
 
 
-SnapshotCombFail <- SnapshotComb2 |> dplyr::filter(
+MasterFail <- MasterTable3 |> dplyr::filter(
   TreatmentStatus == "Failed",
   SurgicalTreatment == "Surgical"
 )
@@ -1057,11 +1098,11 @@ gs4_auth(token = drive_token())
 
 with_gs4_quiet(googlesheets4::range_write(
   ss = SheetIDs$AuditResults,
-  data = SnapshotCombFail |> dplyr::select(
+  data = MasterFail |> dplyr::select(
     TreatmentID,
     CombID,
     DateTreatment,
-    Cohort,
+    RegistryCohortName,
     TreatmentStatus,
     TreatmentStatusNotes,
     DateStatusChange
@@ -1079,8 +1120,8 @@ Read in results of manual review of failure cases and categorise subsequent trea
 
 ```{r}
 
-SnapshotSubseq <- SnapshotComb2 |> dplyr::filter(
-  CombID %in% SnapshotCombFail$CombID
+MasterSubseq <- MasterTable3 |> dplyr::filter(
+  CombID %in% MasterFail$CombID
 ) |> dplyr::select(
   TreatmentID,
   CombID,
@@ -1106,7 +1147,7 @@ SnapshotSubseq <- SnapshotComb2 |> dplyr::filter(
 # Authenticate for sheets using the same token
 gs4_auth(token = drive_token())
 
-SnapshotRevision <- googlesheets4::range_read(
+MasterRevision <- googlesheets4::range_read(
   ss = SheetIDs$AuditResults,
   sheet = "Failures",
   range = "A1:H",
@@ -1118,9 +1159,9 @@ SnapshotRevision <- googlesheets4::range_read(
 
 ```{r}
 
-SnapshotComb2a <- left_join(
-  SnapshotComb2,
-  SnapshotRevision |> dplyr::select(
+MasterTable4 <- left_join(
+  MasterTable3,
+  MasterRevision |> dplyr::select(
     TreatmentID,
     SubsequentTx
   ),
@@ -1137,14 +1178,21 @@ SnapshotComb2a <- left_join(
       is.na(ReoperationProcedure) & !(SubsequentTx2 == "Nonoperative Management" | SubsequentTx2 == "Not Applicable") ~ "Yes",
       ReoperationProcedure == "No" & !(SubsequentTx2 == "Nonoperative Management" | SubsequentTx2 == "Not Applicable") ~ "Yes",
       .default = ReoperationProcedure
-    )
+    ),
+    Sex2 = case_when(
+      Sex == "F" ~ "Female",
+      Sex == "M" ~ "Male",
+      .default = NA_character_
+  )
+) |> dplyr::select(-Sex) |> rename(
+  Sex = "Sex2"
 )
 ```
 
 ```{r}
-SnapshotCombCheck <- SnapshotComb2a |> dplyr::select(
+MasterCheck <- MasterTable4 |> dplyr::select(
   TreatmentID,
-  Cohort,
+  RegistryCohortName,
   TreatmentStatus,
   TreatmentStatusNotes,
   ReoperationProcedure2,
@@ -1152,99 +1200,6 @@ SnapshotCombCheck <- SnapshotComb2a |> dplyr::select(
 )
 ```
 
-## Prepare patient group of interest
-
-Tables were rearranged and the dataset was filtered for cases receiving the hardware of interest.
-
-```{r}
-#| label: strobe-input
-#| code-summary: "CONSORT|STROBE"
-
-
-# Inclusion
-# - Surgical treatment
-# - With hardware of interest
-# After "induction"
-# - Patient withdraws consent
-# - Treatment fails before analysis date
-# - Not eligible for 3m followup
-# 
-
-STROBEFlow <- STROBEInput |> dplyr::filter(
-  !is.na(TreatmentID)
-) |> dplyr::left_join(
-  SnapshotComb1 |> dplyr::select(
-    TreatmentID,
-    CombID,
-    DateInitialExamination,
-    EligibleAtPreop,
-    EligibleAtx3months
-  ),
-  by = "TreatmentID"
-) |> dplyr::mutate(
-  DurationTotal = as.numeric(as.duration(interval(ymd(DateTreatment), ymd(SnapshotDate))),"days"),
-  exclusion1 = case_when(
-    is.na(SurgicalTreatment) ~ "Not a surgical treatment",
-    SurgicalTreatment == "Surgical" ~ NA_character_,
-    .default = "Not a surgical treatment"
-  ),
-  induction = if_else(
-    !is.na(exclusion1),
-    NA_character_,
-    TreatmentID
-  ),
-  exclusion2 = case_when(
-    !is.na(induction) & stringr::str_detect(RegistryStatus,"Opt-out") ~ "Patient Opt-Out",
-    !is.na(induction) & stringr::str_detect(ImplantCodes,"05.10.002") ~ NA_character_,
-    (!is.na(induction) & stringr::str_detect(ImplantCodes,"05.10.002", negate = TRUE)) | (!is.na(induction) & is.na(ImplantCodes)) ~ "No hardware of interest"
-  ),
-  followup = if_else(
-    !is.na(induction) & is.na(exclusion2),
-    TreatmentID,
-    NA_character_
-  ),
-  arm3 = if_else(
-    !is.na(followup),
-    RegistryCohortName,
-    NA_character_
-  ),
-  lost_followup = case_when(
-    !is.na(induction) & is.na(exclusion2) & is.na(EligibleAtx3months) & TreatmentStatus == "Failed" & (ymd(DateStatusChange) < ymd(SnapshotDate)) ~ "Repair failure",
-    !is.na(induction) & is.na(exclusion2) & is.na(EligibleAtx3months) & TreatmentStatus == "No further followup" & (ymd(DateStatusChange) < ymd(SnapshotDate)) ~ "Patient Opt-out",
-    !is.na(induction) & is.na(exclusion2) & TreatmentStatus == "Ongoing" & is.na(EligibleAtx3months) ~ "Not eligible for followup"
-  ),
-  mitt = if_else(
-    !is.na(followup) & is.na(lost_followup),
-    TreatmentID,
-    NA_character_
-)
-) |> dplyr::rename(
-  trialno = "TreatmentID"
-)
-
-
-```
-
-Reduce to master table and adjust sex for report presentation
-
-```{r}
-#| label: master-list
-
-
-MasterTable <- SnapshotComb2a |> filter(
-  TreatmentID %in% STROBEFlow$followup
-) |> mutate(
-  Sex2 = case_when(
-    Sex == "F" ~ "Female",
-    Sex == "M" ~ "Male",
-    .default = NA_character_
-  )
-) |> dplyr::select(-Sex) |> rename(
-  Sex = "Sex2"
-)
-
-
-```
 
 ## Prepare Patient-Reported Outcomes
 
@@ -1257,7 +1212,7 @@ The PRULO registry uses the QuickDASH [@gummesson2006] for all cases, Western On
 
 #Add delta columns Pre-3months; Pre-6months; Pre-12months
 
-MasterPROM <- MasterTable |>
+MasterPROM <- MasterTable4 |>
   rename_with( ~sub("_TotalScore_","",.), contains("TotalScore")) |>
   rename_with( ~sub("WOSI_Norm_","WOSINorm",.), contains("WOSI_Norm")) |>
   rename_with( ~sub("WORC_Norm_","WORCNorm",.), contains("WORC_Norm")) |>
@@ -1385,7 +1340,7 @@ Adverse events were monitored by near real-time chart review and surgical bookin
 # Slice out intraoperative complications (explants)
 # 
 # 
-IntraopComp <- MasterTable |> dplyr::select(
+IntraopComp <- MasterTable4 |> dplyr::select(
   TreatmentID,
   CombID,
   DateTreatment,
@@ -1415,12 +1370,14 @@ ComplicTable1 <- ComplicTable |> dplyr::filter(
     ) |>
   mutate(
     TreatmentID = trimws(`Treatment ID`)
+  ) |> filter(
+    TreatmentID %in% MasterTable4$TreatmentID
   )
 
 #Tidy up TreatmentID in both tables
 # Remove leading and trailing whitespaces
 
-SnapshotComb2a$TreatmentID <- trimws(SnapshotComb2a$TreatmentID)
+MasterTable4$TreatmentID <- trimws(MasterTable4$TreatmentID)
 # Check data types
 #str(ComplicTable1$TreatmentID)
 #str(SnapshotComb2$TreatmentID)
@@ -1438,19 +1395,12 @@ na_in_SnapshotComb2a <- sum(is.na(SnapshotComb2a$TreatmentID))
 
 <!--# Clean up live tables for complications. Assess date validity and correct data entry. -->
 
-```{r}
-mismatched_rows <- ComplicTable1[!(ComplicTable1$TreatmentID %in% MasterTable$TreatmentID), ]
-
-# Remove non-matching rows from ComplicTable2
-ComplicTable2 <- ComplicTable1 |>
-  filter(!(TreatmentID %in% mismatched_rows$TreatmentID))
-```
 
 ```{r}
 # Join in key data from Snapshot table to calculate additional columns
-ComplicTable3 <- left_join(
-  ComplicTable2,
-  SnapshotComb2a |> dplyr::select(
+ComplicTable2 <- left_join(
+  ComplicTable1,
+  MasterTable4 |> dplyr::select(
   TreatmentID,
   DateStatusChange,
   DateTreatment,
@@ -1537,7 +1487,7 @@ DateCheck = case_when(
 ```{r}
 #| label: complication-check
 
-ComplicFailCheck <- ComplicTable3 |> filter(
+ComplicFailCheck <- ComplicTable2 |> filter(
   !is.na(DateStatusChange)
 ) |> mutate(
   StatusDiff = ymd(DateStatusChange) - ymd(`Date of Occurrence`)
@@ -1571,19 +1521,19 @@ Split out into arrays to bounce against for each Product report
 
 ```{r}
 
-ComplicInfection <- ComplicTable3 |> dplyr::group_by(TreatmentID) |> filter(Infection == "Yes") |> slice_min(DateOccurFix, n = 1) |> ungroup()
-ComplicLigament_Tendon <- ComplicTable3 |> group_by(TreatmentID) |> filter(Ligament_Tendon == "Yes") |> slice_min(DateOccurFix, n = 1) |> ungroup()
-ComplicStiffness <- ComplicTable3 |> group_by(TreatmentID) |> filter(Stiffness == "Yes") |> slice_min(DateOccurFix, n = 1) |> ungroup()
-ComplicLoosening <- ComplicTable3 |> group_by(TreatmentID) |> filter(Loosening == "Yes") |> slice_min(DateOccurFix, n = 1) |> ungroup()
-ComplicHardware <- ComplicTable3 |> group_by(TreatmentID) |> filter(Hardware == "Yes" & Loosening == "No") |> slice_min(DateOccurFix, n = 1) |> ungroup()
-ComplicInstability <- ComplicTable3 |> group_by(TreatmentID) |> filter(Instability == "Yes") |> slice_min(DateOccurFix, n = 1) |> ungroup()
-ComplicNeurological <- ComplicTable3 |> group_by(TreatmentID) |> filter(Neurological == "Yes") |> slice_min(DateOccurFix, n = 1) |> ungroup()
-ComplicFracture <- ComplicTable3 |> group_by(TreatmentID) |> filter(Fracture == "Yes") |> slice_min(DateOccurFix, n = 1) |> ungroup()
-ComplicThrombosis <- ComplicTable3 |> group_by(TreatmentID) |> filter(Thrombosis == "Yes") |> slice_min(DateOccurFix, n = 1) |> ungroup()
-ComplicEffusion <- ComplicTable3 |> group_by(TreatmentID) |> filter(Effusion == "Yes") |> slice_min(DateOccurFix, n = 1) |> ungroup()
-ComplicPain <- ComplicTable3 |> group_by(TreatmentID) |> filter(PainIsol == "Yes") |> slice_min(DateOccurFix, n = 1) |> ungroup()
-ComplicOther <- ComplicTable3 |> group_by(TreatmentID) |> filter(Other == "Yes") |> slice_min(DateOccurFix, n = 1) |> ungroup()
-ComplicReop <- ComplicTable3 |> group_by(TreatmentID) |> filter(`Reoperation Procedure` == "Yes") |> slice_min(DateOccurFix, n = 1) |> ungroup()
+ComplicInfection <- ComplicTable2 |> dplyr::group_by(TreatmentID) |> filter(Infection == "Yes") |> slice_min(DateOccurFix, n = 1) |> ungroup()
+ComplicLigament_Tendon <- ComplicTable2 |> group_by(TreatmentID) |> filter(Ligament_Tendon == "Yes") |> slice_min(DateOccurFix, n = 1) |> ungroup()
+ComplicStiffness <- ComplicTable2 |> group_by(TreatmentID) |> filter(Stiffness == "Yes") |> slice_min(DateOccurFix, n = 1) |> ungroup()
+ComplicLoosening <- ComplicTable2 |> group_by(TreatmentID) |> filter(Loosening == "Yes") |> slice_min(DateOccurFix, n = 1) |> ungroup()
+ComplicHardware <- ComplicTable2 |> group_by(TreatmentID) |> filter(Hardware == "Yes" & Loosening == "No") |> slice_min(DateOccurFix, n = 1) |> ungroup()
+ComplicInstability <- ComplicTable2 |> group_by(TreatmentID) |> filter(Instability == "Yes") |> slice_min(DateOccurFix, n = 1) |> ungroup()
+ComplicNeurological <- ComplicTable2 |> group_by(TreatmentID) |> filter(Neurological == "Yes") |> slice_min(DateOccurFix, n = 1) |> ungroup()
+ComplicFracture <- ComplicTable2 |> group_by(TreatmentID) |> filter(Fracture == "Yes") |> slice_min(DateOccurFix, n = 1) |> ungroup()
+ComplicThrombosis <- ComplicTable2 |> group_by(TreatmentID) |> filter(Thrombosis == "Yes") |> slice_min(DateOccurFix, n = 1) |> ungroup()
+ComplicEffusion <- ComplicTable2 |> group_by(TreatmentID) |> filter(Effusion == "Yes") |> slice_min(DateOccurFix, n = 1) |> ungroup()
+ComplicPain <- ComplicTable2 |> group_by(TreatmentID) |> filter(PainIsol == "Yes") |> slice_min(DateOccurFix, n = 1) |> ungroup()
+ComplicOther <- ComplicTable2 |> group_by(TreatmentID) |> filter(Other == "Yes") |> slice_min(DateOccurFix, n = 1) |> ungroup()
+ComplicReop <- ComplicTable2 |> group_by(TreatmentID) |> filter(`Reoperation Procedure` == "Yes") |> slice_min(DateOccurFix, n = 1) |> ungroup()
 
 
 ```
@@ -1596,14 +1546,14 @@ Intraoperative complications were reviewed manually for mechanism.
 #| label: Complication-discrepancies
 #| eval: false
 
-ComplicDiscrep <- ComplicTable3 |> filter(
+ComplicDiscrep <- ComplicTable2 |> filter(
   DateCheck == "Check"|
     is.na(`Complication Nature`)|
     (`Reoperation Procedure` == "Yes" & `Complication Occurrence` == "No")
 )
 
 #Identify duplicate entries
-ComplicDiscrep2 <- ComplicTable3 |>
+ComplicDiscrep2 <- ComplicTable2 |>
   group_by(TreatmentID, DateOccurFix) |>
   filter(n() > 1)
 
@@ -1679,12 +1629,12 @@ knitr::knit_print(STROBEPlot)
 #| label: tbl-diagnosis
 #| tbl-cap: "Summary of diagnoses using ICD-10 coding for primary presentation"
 
-DiagnosisData <- MasterTable  |> mutate(
+DiagnosisData <- MasterTable4  |> mutate(
     ICD10 = stringr::str_extract(DiagnosisPrimary,"^[A-Za-z]+[0-9.]+")
   )
 
 TableData <- DiagnosisData |> group_by(
-           Cohort
+           RegistryCohortName
            ) |> count(
              ICD10, 
              sort = TRUE
@@ -1703,10 +1653,10 @@ Usage of the Product within the patient group is summarised below.
 #| label:  Overview-Rep
 
 {
-  if(nrow(MasterTable) == 1) {
-    epoxy::epoxy("There is {nrow(MasterTable1)} case involving the anchor of interest.")
+  if(nrow(MasterTable4) == 1) {
+    epoxy::epoxy("There is {nrow(MasterTable4)} case involving the anchor of interest.")
   } else {
-    procedures <- unique(MasterTable$ProcedureTotal)
+    procedures <- unique(MasterTable4$ProcedureTotal)
     procedures <- procedures[procedures != "None" & procedures != "Unknown" & procedures != ""]
     procedures <- procedures[!grepl("^(Tenodesis|Tenotomy)$", procedures)]
     
@@ -1717,7 +1667,7 @@ Usage of the Product within the patient group is summarised below.
       procedures
     }
     
-    epoxy::epoxy("There are {nrow(MasterTable)} cases involving the anchor of interest. Surgeries were performed between {format(min(MasterTable$DateTreatment),'%Y-%b-%d')} and {format(max(MasterTable$DateTreatment),'%Y-%b-%d')}. The procedures included [{procedures_string}].")
+    epoxy::epoxy("There are {nrow(MasterTable4)} cases involving the anchor of interest. Surgeries were performed between {format(min(MasterTable4$DateTreatment),'%Y-%b-%d')} and {format(max(MasterTable4$DateTreatment),'%Y-%b-%d')}. The procedures included [{procedures_string}].")
   }
 }
 
@@ -1727,7 +1677,7 @@ Usage of the Product within the patient group is summarised below.
 #| label: Slice-stack-2
 
 
-MasterTable1 <- MasterTable |> mutate(
+MasterTable5 <- MasterTable4 |> mutate(
     CuffStatus2 = case_when(
       is.na(CuffStatus) & !is.na(PatientPosition) ~ "Intact",
       !is.na(CuffStatus) ~ CuffStatus,
@@ -1745,7 +1695,6 @@ MasterTable1 <- MasterTable |> mutate(
   Effusion = TreatmentID %in% ComplicEffusion$TreatmentID,
   Pain = TreatmentID %in% ComplicPain$TreatmentID,
   Other = TreatmentID %in% ComplicOther$TreatmentID,
-
   Reop = TreatmentID %in% ComplicReop$TreatmentID
 ) |> left_join(
   ComplicTable3 |> group_by(TreatmentID) |> slice_max(`Reoperation Procedure Date`, n = 1) |> ungroup() |> dplyr::select(
@@ -1770,7 +1719,7 @@ Patient demographic, pathology, and treatment characteristics for this cohort re
 #| tbl-cap: "Summary of PRULO Report JLock (All) - Patient Characteristics"
 
 TableRep <-
-  MasterTable1 |> mutate(
+  MasterTable5 |> mutate(
     SurgeonA = case_when(
       Surgeon == "KE" ~ "A",
       Surgeon == "RP" ~ "B",
@@ -1789,7 +1738,7 @@ TableRep <-
     #LongHeadBiceps,
     TreatmentStatus,
     RegistryStatus,
-    Cohort
+    RegistryCohortName
     ) |>
     tbl_summary(
       #by = LongHeadBiceps,
@@ -1820,7 +1769,7 @@ TableRep <-
       statistic = list(
         all_categorical() ~ "{p} ({n})"
         ),
-      by = "Cohort",
+      by = "RegistryCohortName",
       missing = "no"
     ) |> add_overall() |> add_stat_label(
     location = "column"
@@ -1997,7 +1946,7 @@ Complications and adverse events are summarised below. Individual reoperation da
 
 
 # Check if any Count value is greater than zero in filtered data
-has_complications <- MasterTable1 |> 
+has_complications <- MasterTable4 |> 
   filter(TreatmentID %in% IntraopComp$TreatmentID) |> 
   nrow() > 0
 
@@ -2028,25 +1977,13 @@ if (has_complications == 0) {
 
 Of the cases identified in @tbl-intraopcomp, all were deemed unrelated to the anchor of interest.
 
-```{r}
-#| label:  Complication-Other-Rep
-
-
-MasterTableOther <- MasterTable1 |> filter(
-  Other == TRUE
-) |> dplyr::select(
-  TreatmentID,
-  DateTreatment,
-  Cohort
-)
-```
 
 ```{r}
 #| label: tbl-TableRep4
 #| tbl-cap: "Summary of PRULO Report (JLock) Cases - Postoperative Events"
 
 # Now create the summary table
-TableRepPC <- MasterTable1 |>
+TableRepPC <- MasterTable5 |>
   dplyr::select(
     Infection,
     Ligament_Tendon,
