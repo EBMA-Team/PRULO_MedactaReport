@@ -472,7 +472,7 @@ STROBEInput <- openxlsx2::read_xlsx(
 #| label: Declare-date
 
 The snapshot date was {# Format to desired format using format()
-FormattedDate <- format(SnapshotDate, "%d-%b-%Y")} and the report prepared {format(today(), "%d-%b-%Y")}. The imported data contains a dataframe of {nrow(SnapshotRC)} cases returned from the Rotator Cuff cohort, a dataframe of {nrow(SnapshotGHI)} cases returned from the Glenohumeral Instability cohort and a dataframe of {nrow(SnapshotGen)} cases from the General cohort. An additional dataframe was retrieved of {nrow(STROBEInput)} cases to generate the STROBE flow chart from the PRULO registry. 
+FormattedDate <- format(SnapshotDate, "%d-%b-%Y")} and the report prepared {format(today(), "%d-%b-%Y")}. The imported data contains a dataframe of {nrow(Snapshot |> filter(RegistryCohortName == "RotatorCuff"))} cases returned from the Rotator Cuff cohort, a dataframe of {nrow(Snapshot |> filter(RegistryCohortName == "GlenohumeralInstability"))} cases returned from the Glenohumeral Instability cohort and a dataframe of {nrow(Snapshot |> filter(RegistryCohortName == "ShoulderGeneral"))} cases from the General cohort. An additional dataframe was retrieved of {nrow(STROBEInput)} cases to generate the STROBE flow chart from the PRULO registry. 
 
 ```
 
