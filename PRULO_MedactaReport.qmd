@@ -13,7 +13,7 @@ format:
     toc: true
     toc-depth: 1
     toc-expand: true
-    toc-location: right-body
+    toc-location: left
     link-external-icon: true
     link-external-newwindow: true
     smooth-scroll: true
@@ -207,100 +207,7 @@ get_specific_snapshot <- function(folder_name, base_folder_id = base_folder_id1)
 
 ```
 
-```{r}
-# Function to generate multiple dataframe pairs from a configuration list
-Generate_selectrep <- function(config_list, ProductTable, SnapshotComb4, 
-                               ComplicInfection, ComplicLigament_Tendon, 
-                               ComplicStiffness, ComplicLoosening, ComplicHardware, 
-                               ComplicInstability, ComplicNeurological, ComplicFracture,
-                               ComplicThrombosis, ComplicEffusion, ComplicPain, 
-                               ComplicOther, ComplicIntraop, ComplicReop, ComplicTable3, 
-                               ...) {
-  
-  result_list <- list()
-  
-  for(i in seq_along(config_list)) {
-    config <- config_list[[i]]
-    df_name <- names(config_list)[i]
-    
-    # Prepare PROM arguments if specified
-    prom_args <- list()
-    if (!is.null(config$proms)) {
-      dots <- list(...)
-      for (prom_name in config$proms) {
-        if (prom_name %in% names(dots)) {
-          prom_args[[prom_name]] <- dots[[prom_name]]
-        }
-      }
-    }
-    
-    # Create the dataframe pair with subsets and PROMs
-    df_results <- do.call(create_dataframe_pair, c(
-      list(
-        df_name = df_name,
-        category = config$category,
-        search_terms = config$search_terms,
-        pattern = config$pattern,
-        subsets = config$subsets,
-        proms = config$proms,
-        ProductTable = ProductTable,
-        SnapshotComb4 = SnapshotComb4,
-        ComplicInfection = ComplicInfection,
-        ComplicLigament_Tendon = ComplicLigament_Tendon,
-        ComplicStiffness = ComplicStiffness,
-        ComplicLoosening = ComplicLoosening,
-        ComplicHardware = ComplicHardware,
-        ComplicInstability = ComplicInstability,
-        ComplicNeurological = ComplicNeurological,
-        ComplicFracture = ComplicFracture,
-        ComplicThrombosis = ComplicThrombosis,
-        ComplicEffusion = ComplicEffusion,
-        ComplicPain = ComplicPain,
-        ComplicOther = ComplicOther,
-        ComplicIntraop = ComplicIntraop,
-        ComplicReop = ComplicReop,
-        ComplicTable3 = ComplicTable3
-      ),
-      prom_args
-    ))
-    
-    # Store main dataframes
-    result_list[[paste0("RefCode", i)]] <- df_results$RefCode
-    result_list[[paste0("SelectRep", i)]] <- df_results$SelectRep
-    
-    # Store PROMs
-    if (!is.null(config$proms)) {
-      for (prom_name in config$proms) {
-        if (prom_name %in% names(df_results)) {
-          result_list[[paste0("SelectRep", i, prom_name)]] <- df_results[[prom_name]]
-        }
-      }
-    }
-    
-    # Store subsets with appropriate naming
-    if (!is.null(config$subsets)) {
-      for (subset_name in names(config$subsets)) {
-        # Main subset
-        if (subset_name %in% names(df_results)) {
-          result_list[[paste0("SelectRep", i, subset_name)]] <- df_results[[subset_name]]
-        }
-        
-        # PROM subsets
-        if (!is.null(config$proms)) {
-          for (prom_name in config$proms) {
-            prom_subset_name <- paste0(subset_name, prom_name)
-            if (prom_subset_name %in% names(df_results)) {
-              result_list[[paste0("SelectRep", i, prom_subset_name)]] <- df_results[[prom_subset_name]]
-            }
-          }
-        }
-      }
-    }
-  }
-  
-  return(result_list)
-}
-```
+
 
 ## Import Inputs
 
@@ -498,7 +405,7 @@ Tables were rearranged and the dataset was filtered for cases receiving the hard
 STROBEFlow <- STROBEInput |> dplyr::filter(
   !is.na(TreatmentID)
 ) |> dplyr::left_join(
-  SnapshotComb1 |> dplyr::select(
+  Snapshot |> dplyr::select(
     TreatmentID,
     CombID,
     DateInitialExamination,
@@ -797,7 +704,7 @@ knitr::knit_print(FigProcCount)
 #       to reflect more detailed information about augmentations in the Procedure4 column
 
 ProcedureMaster2 <- left_join(
-  # Filter SnapshotComb1 to only include rows with SurgicalTreatment == "Surgical"
+  # Filter Master to only include rows with SurgicalTreatment == "Surgical"
  MasterTable1 |> filter(SurgicalTreatment == "Surgical") |>
   
   # Select specific columns from the filtered data frame
@@ -1378,18 +1285,8 @@ ComplicTable1 <- ComplicTable |> dplyr::filter(
 # Remove leading and trailing whitespaces
 
 MasterTable4$TreatmentID <- trimws(MasterTable4$TreatmentID)
-# Check data types
-#str(ComplicTable1$TreatmentID)
-#str(SnapshotComb2$TreatmentID)
 
-#str(SnapshotComb2$DateTreatment)
-
-# Check for NAs in ComplicTable1
 na_in_ComplicTable1 <- sum(is.na(ComplicTable1$TreatmentID))
-
-
-# Check for NAs in SnapshotMerge2
-na_in_SnapshotComb2a <- sum(is.na(SnapshotComb2a$TreatmentID))
 
 ```
 
@@ -1509,7 +1406,7 @@ ComplicFailCheck <- ComplicTable2 |> filter(
 
 with_gs4_quiet(googlesheets4::range_write(
   ss = SheetIDs$AuditResults,
-  data = ComplicTable3,
+  data = ComplicTable2,
   sheet = "ComplicTable",
   range = "A1:AN",
   col_names = TRUE
@@ -1697,7 +1594,7 @@ MasterTable5 <- MasterTable4 |> mutate(
   Other = TreatmentID %in% ComplicOther$TreatmentID,
   Reop = TreatmentID %in% ComplicReop$TreatmentID
 ) |> left_join(
-  ComplicTable3 |> group_by(TreatmentID) |> slice_max(`Reoperation Procedure Date`, n = 1) |> ungroup() |> dplyr::select(
+  ComplicTable2 |> group_by(TreatmentID) |> slice_max(`Reoperation Procedure Date`, n = 1) |> ungroup() |> dplyr::select(
     TreatmentID,
     ReopDelay_Occur,
     ReopDelay_Surgery,
@@ -1729,7 +1626,7 @@ TableRep <-
   dplyr::select(
     AgeAtInitialExam,
     Sex,
-    Cohort,
+    RegistryCohortName,
     IndexSide,
     BilateralStatus,
     SymptomDuration,
@@ -1808,7 +1705,7 @@ Surgical findings and management strategies are summarised below.
 
 
 TableRep2 <-
-  MasterTable1 |>
+  MasterTable5 |>
   dplyr::select(
     CuffStatus2,
     TreatmentType,
@@ -1853,7 +1750,7 @@ gtsummary::as_flex_table(TableRep2) |> flextable::set_table_properties(
 #| label:  Duration
 
 
-The mean follow up duration is {round(MasterTable1 |> ungroup() |> summarise(mean = mean(Duration))/52,1)} years, with a standard deviation of {round(MasterTable1 |> ungroup() |> summarise(sd = sd(Duration))/52,2)} years.
+The mean follow up duration is {round(MasterTable5 |> ungroup() |> summarise(mean = mean(Duration))/52,1)} years, with a standard deviation of {round(MasterTable5 |> ungroup() |> summarise(sd = sd(Duration))/52,2)} years.
 
 ```
 
@@ -1865,7 +1762,7 @@ Failure or revision events as identified in the registry for this cohort are sum
 
 TableRep3 <- tbl_survfit(
   survfit2(Surv(Duration, Status) ~ 1, 
-           data = MasterTable1),
+           data = MasterTable5),
   times = c(1,26,52,104),
   label_header = "**{time} Weeks**",
   label = "Procedure Survival",
@@ -1893,7 +1790,7 @@ gtsummary::as_flex_table(TableRep3) |> flextable::set_table_properties(
 #Anchor 1 Anchor 2 Anchor 3 Anchor 4
 
 FailuresRep <-
-  MasterTable1 |> mutate(
+  MasterTable5 |> mutate(
     TreatmentStatusDesc = stringr::str_to_sentence(TreatmentStatusNotes)
   ) |>
       filter(TreatmentStatus == "Failed") |> 
@@ -1946,7 +1843,7 @@ Complications and adverse events are summarised below. Individual reoperation da
 
 
 # Check if any Count value is greater than zero in filtered data
-has_complications <- MasterTable4 |> 
+has_complications <- MasterTable5 |> 
   filter(TreatmentID %in% IntraopComp$TreatmentID) |> 
   nrow() > 0
 
@@ -2053,8 +1950,8 @@ gtsummary::as_flex_table(TableRepPC) |> flextable::set_table_properties(
 ##Flip this around so that multiple reoperations are retained
 
 
-MasterTableReop <- ComplicTable3 |> filter(
-  TreatmentID %in% MasterTable1$TreatmentID,
+MasterTableReop <- ComplicTable2 |> filter(
+  TreatmentID %in% MasterTable5$TreatmentID,
   `Reoperation Procedure` == "Yes"
   ) |> group_by(TreatmentID) |> slice_min(
     ReopDelay_Surgery,
