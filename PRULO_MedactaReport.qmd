@@ -101,6 +101,7 @@ Load up required packages in advance.
 
  if(!require("pacman")) install.packages("pacman")
 pacman::p_load(
+  "xfun",
   "knitr",
   "cardx",
   "quarto",
@@ -207,6 +208,13 @@ get_specific_snapshot <- function(folder_name, base_folder_id = base_folder_id1)
 
 ```
 
+```{r}
+
+convert_small_numbers <- function(x) {
+  if_else(x < 10, xfun::numbers_to_words(x), as.character(x))
+}
+
+```
 
 
 ## Import Inputs
@@ -1743,6 +1751,38 @@ gtsummary::as_flex_table(TableRep2) |> flextable::set_table_properties(
     )
 )
 ```
+
+### Product Usage
+
+
+```{r}
+
+get_mode <- function(data) {
+  tibble(value = data) |>
+    filter(!is.na(value)) |>
+    count(value, sort = TRUE) |>
+    slice(1) |>
+    pull(value)
+}
+
+
+ProductUse <- MasterTable5 |> mutate(
+  AnchorCount = stringr::str_count(ImplantCodes,"05.10.002")
+) |> summarise(
+  Median = median(AnchorCount),
+  Mode = get_mode(AnchorCount),
+  Max = max(AnchorCount)
+)
+
+
+```
+
+```{epoxy}
+
+The usage of the anchors per procedure ranged from one to {convert_small_numbers(ProductUse$Max)}, with a median of {convert_small_numbers(ProductUse$Median)}. The most frequent number of anchors implanted per procedure was {convert_small_numbers(ProductUse$Mode)}.
+
+```
+
 
 ## Treatment Survival
 
